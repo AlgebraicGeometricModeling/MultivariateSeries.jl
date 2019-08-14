@@ -86,7 +86,7 @@ The package is available at [https://gitlab.inria.fr/AlgebraicGeometricModeling/
 
 To install it from Julia:
 ```julia
-Pkg.clone("https://gitlab.inria.fr/AlgebraicGeometricModeling/MultivariateSeries.jl.git")
+Pkg.clone("https://github.com/JuliaAlgebra/MultivariateSeries.jl.git")
 ```
 It can then be used as follows:
 ```julia

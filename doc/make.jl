@@ -19,12 +19,12 @@ makedocs(
         "Example" => Expl,
         "Functions & types" => Code
     ],
-    repo = "https://gitlab.inria.fr/AlgebraicGeometricModeling/MultivariateSeries.jl/tree/master",
+    repo = "https://github.com/JuliaAlgebra/MultivariateSeries.jl/tree/master",
     doctest = false
 )
 
 deploydocs(
-    repo = "gitlab.inria.fr/AlgebraicGeometricModeling/MultivariateSeries.jl.git",
+    repo = "github.com/JuliaAlgebra/MultivariateSeries.jl.git",
     target = "site",
     version = "v1.0.0",
     deps = nothing,

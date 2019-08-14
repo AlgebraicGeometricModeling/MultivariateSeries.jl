@@ -8,7 +8,7 @@ To install the package within julia:
 
 ```julia
 using Pkg
-Pkg.clone("https://gitlab.inria.fr/AlgebraicGeometricModeling/MultivariateSeries.jl.git")
+Pkg.clone("https://github.com/JuliaAlgebra/MultivariateSeries.jl.git")
 ```
 
 ## Example
