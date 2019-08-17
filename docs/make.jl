@@ -13,14 +13,15 @@ makedocs(
     authors = "B. Mourrain",
     modules = [MultivariateSeries],
     build = "build",
+    strict = true,
+    doctest = false,
     source = dir,
     pages = Any[
         "Home" => "index.md",
         "Example" => Expl,
         "Functions & types" => Code
     ],
-    repo = "https://github.com/JuliaAlgebra/MultivariateSeries.jl/tree/master",
-    doctest = false
+
 )
 
 deploydocs(

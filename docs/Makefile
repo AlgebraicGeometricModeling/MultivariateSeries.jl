@@ -1,5 +1,5 @@
 all: 
-	cd mrkd/expl; make; cd ..
-	julia --color=yes make.jl
+	cd mrkd/expl; make;
+	cd ..; julia --color=yes docs/make.jl
 deploy:
-	cp -r html/* /Volumes/Bernard.mourrain/software/MultivariateSeries
+	cp -r docs/build/* /Volumes/Bernard.mourrain/software/MultivariateSeries
