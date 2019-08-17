@@ -1,0 +1,10 @@
+name = "MultivariateSeries"
+repo = "https://github.com/JuliaAlgebra/MultivariateSeries.jl.git"
+version = "0.0.1"
+
+[deps]
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+
+[compat]
+MultivariatePolynomials = "≥ 0.1.0"
+julia = "1"

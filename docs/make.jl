@@ -3,7 +3,7 @@ using LinearAlgebra
 using MultivariatePolynomials
 using MultivariateSeries
 
-dir = "mrkd"
+dir = joinpath(pwd(),"docs/mrkd")
 Expl = map(file -> joinpath("expl", file), filter(x ->endswith(x, "md"), readdir(dir*"/expl")))
 Code = map(file -> joinpath("code", file), filter(x ->endswith(x, "md"), readdir(dir*"/code")))
 
@@ -12,7 +12,7 @@ makedocs(
     sitename = "MultivariateSeries",
     authors = "B. Mourrain",
     modules = [MultivariateSeries],
-    build = "html",
+    build = "build",
     source = dir,
     pages = Any[
         "Home" => "index.md",
@@ -24,9 +24,5 @@ makedocs(
 )
 
 deploydocs(
-    repo = "github.com/JuliaAlgebra/MultivariateSeries.jl.git",
-    target = "site",
-    version = "v1.0.0",
-    deps = nothing,
-    make = nothing
+    repo = "github.com/JuliaAlgebra/MultivariateSeries.jl.git"
 )
