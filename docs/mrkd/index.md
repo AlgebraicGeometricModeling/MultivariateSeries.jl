@@ -52,7 +52,7 @@ Series act as linear functionals on polynomials via the dot product:
     0.0
 
 ### Polynomial-exponential decomposition        
-The package provide tools for solving the following decomposition problems:
+The package provide tools for solving the following decomposition problem:
 
 Given (the first terms of) sequence ``\sigma \in \mathbb{K}^{\mathbb{N}^{n}}`` or the series 
 ``\sigma(\mathbf{y}) \in \mathbb{K}[[\mathbf{y}]]``, we want to decompose it as polynomial-exponential series 

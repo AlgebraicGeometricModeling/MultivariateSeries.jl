@@ -8,22 +8,20 @@ Expl = map(file -> joinpath("expl", file), filter(x ->endswith(x, "md"), readdir
 Code = map(file -> joinpath("code", file), filter(x ->endswith(x, "md"), readdir(dir*"/code")))
 
 makedocs(
-    format = Documenter.HTML(),
     sitename = "MultivariateSeries",
+    format = Documenter.HTML(),
     authors = "B. Mourrain",
     modules = [MultivariateSeries],
     build = "build",
-    strict = true,
-    doctest = false,
     source = dir,
     pages = Any[
         "Home" => "index.md",
         "Example" => Expl,
         "Functions & types" => Code
     ],
-
+    doctest = false
 )
 
 deploydocs(
-    repo = "github.com/JuliaAlgebra/MultivariateSeries.jl.git"
+    repo = "github.com/bmourrain/MultivariateSeries.jl.git"
 )
