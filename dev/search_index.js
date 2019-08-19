@@ -53,7 +53,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Installation",
     "category": "section",
-    "text": "The package is available at https://gitlab.inria.fr/AlgebraicGeometricModeling/MultivariateSeries.jl.To install it from Julia:Pkg.clone(\"https://github.com/JuliaAlgebra/MultivariateSeries.jl.git\")It can then be used as follows:using MultivariateSeriesSee the Examples for more details."
+    "text": "The package is available at https://github.com/JuliaAlgebra/MultivariateSeries.jl.gitTo install it from Julia:using Pkg\nPkg.clone(\"https://github.com/JuliaAlgebra/MultivariateSeries.jl.git\")It can then be used as follows:using MultivariateSeriesSee the Examples for more details."
 },
 
 {
