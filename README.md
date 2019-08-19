@@ -8,7 +8,7 @@ To install the package within julia:
 
 ```julia
 using Pkg
-Pkg.clone("https://github.com/JuliaAlgebra/MultivariateSeries.jl.git")
+Pkg.clone("https://github.com/bmourrain/MultivariateSeries.jl.git")
 ```
 
 ## Example
@@ -37,7 +37,7 @@ w, Xi = decompose(sigma)
 
 ## Documentation
 
-   - [LATEST](http://www-sop.inria.fr/members/Bernard.Mourrain/software/MultivariateSeries/index.html)
+   - [![](https://img.shields.io/badge/docs-latest-blue.svg)](https://bmourrain.github.io/MultivariateSeries.jl/latest)
    - [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://bmourrain.github.io/MultivariateSeries.jl/dev)
    - More information on [Julia](https://julialang.org/)
 

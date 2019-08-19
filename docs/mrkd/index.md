@@ -81,11 +81,12 @@ Pages = map(file -> joinpath("code", file), filter(x ->endswith(x, "md"), readdi
 
 ## [Installation](@id sec_installation)
 
-The package is available at [https://gitlab.inria.fr/AlgebraicGeometricModeling/MultivariateSeries.jl](https://gitlab.inria.fr/AlgebraicGeometricModeling/MultivariateSeries.jl.git).
+The package is available at [https://github.com/JuliaAlgebra/MultivariateSeries.jl.git](https://github.com/JuliaAlgebra/MultivariateSeries.jl.git)
 
 
 To install it from Julia:
 ```julia
+using Pkg
 Pkg.clone("https://github.com/JuliaAlgebra/MultivariateSeries.jl.git")
 ```
 It can then be used as follows:
