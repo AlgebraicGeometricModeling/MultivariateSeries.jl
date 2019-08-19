@@ -37,8 +37,9 @@ w, Xi = decompose(sigma)
 
 ## Documentation
 
-- [LATEST](http://www-sop.inria.fr/members/Bernard.Mourrain/software/MultivariateSeries/index.html)
-- More information on [Julia](https://julialang.org/)
+   - [LATEST](http://www-sop.inria.fr/members/Bernard.Mourrain/software/MultivariateSeries/index.html)
+   - [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://bmourrain.github.io/MultivariateSeries.jl/dev)
+   - More information on [Julia](https://julialang.org/)
 
 
 ## Dependencies
