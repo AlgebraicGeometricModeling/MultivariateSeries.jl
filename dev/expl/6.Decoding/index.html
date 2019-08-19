@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Decoding algebraic codes (BMS) · MultivariateSeries</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link href="../../assets/documenter.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><h1>MultivariateSeries</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="../../search/"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li><a class="toctext" href="../../">Home</a></li><li><span class="toctext">Example</span><ul><li><a class="toctext" href="../0.Decomposition/">Decomposition algorithm</a></li><li><a class="toctext" href="../3.MultivariateProny/">Multivariate exponential decompositon</a></li><li><a class="toctext" href="../4.DiracMeasure/">Weighted sum of Dirac Measures</a></li><li><a class="toctext" href="../5.SparseInterpolation/">Sparse interpolation</a></li><li class="current"><a class="toctext" href>Decoding algebraic codes (BMS)</a><ul class="internal"></ul></li></ul></li><li><span class="toctext">Functions &amp; types</span><ul><li><a class="toctext" href="../../code/1.series/">Series</a></li><li><a class="toctext" href="../../code/2.polynomials/">Polynomials</a></li><li><a class="toctext" href="../../code/3.decompose/">Decomposition</a></li></ul></li></ul></nav><article id="docs"><header><nav><ul><li>Example</li><li><a href>Decoding algebraic codes (BMS)</a></li></ul><a class="edit-page" href="https://github.com/bmourrain/MultivariateSeries.jl/blob/master/docs/mrkd/expl/6.Decoding.md"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Decoding algebraic codes (BMS)</span><a class="fa fa-bars" href="#"></a></div></header><h1><a class="nav-anchor" id="Decoding-algebraic-codes-(BMS)-1" href="#Decoding-algebraic-codes-(BMS)-1">Decoding algebraic codes (BMS)</a></h1><p>We consider the code <span>$C$</span> formed by the words <span>$m\in \mathbb{k}^l$</span> such that  $ m.[f(P<em>1), \ldots, f(P</em>l)]=0 $  where <span>$f\in V\subset \mathbb{k}[x_1,...,x_n]$</span>.</p><pre><code class="language-julia">using MultivariateSeries
+X = @ring x1 x2</code></pre><pre><code class="language-none">2-element Array{DynamicPolynomials.PolyVar{true},1}:
+ x1
+ x2</code></pre><p>We consider the following points <span>$P$</span> and the vector space <span>$V$</span> spanned by the monomials <span>$M$</span> of degree <span>$\le 2$</span> in two variables <span>$x_1, x_2$</span>.</p><pre><code class="language-julia">P = [
+1   1;
+1  -1;
+-1  1;
+-1 -1;
+0   1; 
+2  -1;
+1   2;
+1  -2]&#39;
+
+M = monoms(X,2)</code></pre><pre><code class="language-none">6-element Array{DynamicPolynomials.Monomial{true},1}:
+ 1   
+ x1  
+ x2  
+ x1² 
+ x1x2
+ x2²</code></pre><p>The words of the code are the kernel of the following matrix:</p><pre><code class="language-julia">using DynamicPolynomials
+function vdm(P,L)
+    [ Polynomial{true,Float64}(L[j])(P[:,i])
+        for  j in 1:length(L),i in 1:size(P,2) ]
+end
+W = vdm(P,M)</code></pre><pre><code class="language-none">6×8 Array{Float64,2}:
+ 1.0   1.0   1.0   1.0  1.0   1.0  1.0   1.0
+ 1.0   1.0  -1.0  -1.0  0.0   2.0  1.0   1.0
+ 1.0  -1.0   1.0  -1.0  1.0  -1.0  2.0  -2.0
+ 1.0   1.0   1.0   1.0  0.0   4.0  1.0   1.0
+ 1.0  -1.0  -1.0   1.0  0.0  -2.0  2.0  -2.0
+ 1.0   1.0   1.0   1.0  1.0   1.0  4.0   4.0</code></pre><p>We receive the following word:</p><pre><code class="language-julia">r = [3, 3, 3, 0, -6, -2, 0, -1]</code></pre><pre><code class="language-none">8-element Array{Int64,1}:
+  3
+  3
+  3
+  0
+ -6
+ -2
+  0
+ -1</code></pre><p>It is not a word of code <span>$C$</span>, since the following vector of syndroms is not zero:</p><pre><code class="language-julia">s = W*r</code></pre><pre><code class="language-none">6-element Array{Float64,1}:
+  0.0
+ -2.0
+  1.0
+  0.0
+  3.0
+ -3.0</code></pre><p>We want to correct it. For that, we build the corresponding series of syndroms:</p><pre><code class="language-julia">sigma = dual(M&#39;*s)</code></pre><pre><code class="language-none">3.0dx1*dx2 - 3.0dx2^2 + dx2 - 2.0dx1</code></pre><p>The Hankel matrix of <span>$\sigma$</span> in degree <span>$\le 1$</span> is:</p><pre><code class="language-julia">L1 = monoms(X,1)
+H = hankel(sigma, L1, L1)</code></pre><pre><code class="language-none">3×3 Array{Float64,2}:
+  0.0  -2.0   1.0
+ -2.0   0.0   3.0
+  1.0   3.0  -3.0</code></pre><p>An element in its kernel gives an error locator polynomial of degree <span>$1$</span>:</p><pre><code class="language-julia">using LinearAlgebra
+le = nullspace(H); le/=le[3]
+ple = (L1&#39;*le)[1]</code></pre><p>0.5000000000000002x1 + x2 + 1.5</p><p>We check for which point in P, this polynomial vanishes. This will give the position where an error occurs:</p><pre><code class="language-julia">er = le&#39;*vcat(fill(1.,1,size(P,2)),P)</code></pre><pre><code class="language-none">1×8 Array{Float64,2}:
+ 3.0  1.0  2.0  -2.22045e-16  2.5  1.5  4.0  0.0</code></pre><pre><code class="language-julia">ie = []
+for i in 1:length(er)
+    if isapprox(er[i],0.0;atol=1e-10) push!(ie, i) end
+end
+ie</code></pre><pre><code class="language-none">2-element Array{Any,1}:
+ 4
+ 8</code></pre><p>These are the following points of <span>$P$</span>:</p><pre><code class="language-julia">E = ([P[j,ie[i]] for i in 1:length(ie), j in 1:size(P,1)])&#39;</code></pre><pre><code class="language-none">2×2 Adjoint{Int64,Array{Int64,2}}:
+ -1   1
+ -1  -2</code></pre><p>To get the error, that is the weights, we solve the system: <span>$E*\omega =[\sigma_{x_1}, \sigma_{x_2}]$</span>:</p><pre><code class="language-julia">cr = E\(W*r)[2:3]</code></pre><pre><code class="language-none">2-element Array{Float64,1}:
+  1.0
+ -1.0</code></pre><p>We can now correct the received message by removing the weights <span>$cr$</span> at the positions of the errors <span>$ie$</span>:</p><pre><code class="language-julia">c=copy(r)
+for i in 1:length(ie) c[ie[i]]-= cr[i] end 
+c</code></pre><pre><code class="language-none">8-element Array{Int64,1}:
+  3
+  3
+  3
+ -1
+ -6
+ -2
+  0
+  0</code></pre><p>We check that the corrected message is a word of the code:</p><pre><code class="language-julia">W*c</code></pre><pre><code class="language-none">6-element Array{Float64,1}:
+ 0.0
+ 0.0
+ 0.0
+ 0.0
+ 0.0
+ 0.0</code></pre><footer><hr/><a class="previous" href="../5.SparseInterpolation/"><span class="direction">Previous</span><span class="title">Sparse interpolation</span></a><a class="next" href="../../code/1.series/"><span class="direction">Next</span><span class="title">Series</span></a></footer></article></body></html>
