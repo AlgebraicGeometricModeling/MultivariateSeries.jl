@@ -55,7 +55,7 @@ function MultivariatePolynomials.variables(m::Monomial{C}) where C
 end
 #----------------------------------------------------------------------
 function coeff(t::Term{B,T}) where {B,T}
-  t.α
+    exponent(t.α)
 end
 #----------------------------------------------------------------------
 function Base.one(::Type{Monomial{true}})
@@ -73,6 +73,17 @@ function Base.exponent(m::Monomial)
     return m.z
 end
 
+function Base.exponent(t::Term{B,T}) where {B,T}
+    return t.x.z
+end
+
+# function DynamicPolynomials.monomial(m::Monomial)
+#     return m
+# end
+
+# function DynamicPolynomials.monomial(t::Term{B,T}) where {B,T}
+#     return t.x
+# end
 #----------------------------------------------------------------------
 """
 ```

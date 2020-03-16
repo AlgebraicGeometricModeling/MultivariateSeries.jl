@@ -12,7 +12,3 @@ include("newton.jl")
 include("decompose.jl")
 
 end
-
-# using LinearAlgebra
-# using DynamicPolynomials
-# using MultivariatePolynomials
