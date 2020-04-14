@@ -11,4 +11,16 @@ include("hankel.jl")
 include("newton.jl")
 include("decompose.jl")
 
+export Seq, seq
+
+mutable struct Seq{T} val::T end
+
+function seq(args...)
+    if length(args)>1
+        Seq([args...])
+    else
+        Seq(args[1])
+    end
+end
+
 end
