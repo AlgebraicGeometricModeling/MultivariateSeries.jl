@@ -37,10 +37,20 @@ mutable struct Series{C,M}
 end
 #----------------------------------------------------------------------
 
+"""
+    Construct the series with the term (c,m).
+"""
 function series(c::C, m::M) where {C <: Number, M <: AbstractMonomial}
     Series{C,M}(Dict(m => c))
 end
 
+"""
+   Construct the series from an array of pairs  m=>c where m is a monomial and c the associate coefficient.
+"""
+function series(s::Vector{Pair{M,C}}) where {C <: Number, M <: AbstractMonomial}
+    Series{C,M}(Dict(s))
+end
+    
 MultivariatePolynomials.terms(p::Series) = p.terms
 MultivariatePolynomials.monomials(p::Series) = keys(p.terms)
 
