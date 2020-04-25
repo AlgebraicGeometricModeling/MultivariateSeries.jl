@@ -23,4 +23,12 @@ function seq(args...)
     end
 end
 
+function DynamicPolynomials.MonomialVector(V::Vector{PolyVar{true}}, rg::Seq)
+     L = DynamicPolynomials.Monomial{true}[]
+     for i in rg.val
+         append!(L, DynamicPolynomials.monomials(V,i))
+     end
+     L
+end
+
 end
