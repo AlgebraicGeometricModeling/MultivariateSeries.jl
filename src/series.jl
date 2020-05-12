@@ -5,7 +5,7 @@
 ### Bernard Mourrain
 ###
 
-
+using DataStructures
 export Series, series, zero, convert, monomials, setindex, setindex!, deg, integrate, +, -, *, /, scale, scale!
 
 import Base:
@@ -22,16 +22,16 @@ Class representing multivariate series. The series is a dictionary,
 which associates values of type C to monomials of type M.
 """
 mutable struct Series{C,M}
-    terms::Dict{M,C}
+    terms::OrderedDict{M,C}
 
     function Series{C,M}() where {M, C}
-        new(Dict{M,C}())
+        new(OrderedDict{M,C}())
     end
 
     function Series{C,M}(c::C, m::M) where {C, M}
-        new(Dict(m => c))
+        new(OrderedDict(m => c))
     end
-    function Series{C,M}(t::Dict{M,C}) where {C,M}
+    function Series{C,M}(t::OrderedDict{M,C}) where {C,M}
         new(t)
     end
 end
@@ -41,25 +41,26 @@ end
     Construct the series with the term (c,m).
 """
 function series(c::C, m::M) where {C <: Number, M <: AbstractMonomial}
-    Series{C,M}(Dict(m => c))
+    Series{C,M}(OrderedDict(m => c))
 end
 
 """
    Construct the series from an array of pairs  m=>c where m is a monomial and c the associate coefficient.
 """
 function series(s::Vector{Pair{M,C}}) where {C <: Number, M <: AbstractMonomial}
-    Series{C,M}(Dict(s))
+    Series{C,M}(OrderedDict(s))
 end
     
 MultivariatePolynomials.terms(p::Series) = p.terms
 MultivariatePolynomials.monomials(p::Series) = keys(p.terms)
 
-Base.eltype(::Series{C,M}) where {M, C} = C
+Base.eltype(::Series{C,M}) where {M, C}  = C
+Base.length(s::Series{C,M}) where {M, C} = length(s.terms)
 
 Base.zero(::Type{Series{C,M}}) where {M, C} = Series{C,M}()
 Base.zero(p::Series{C,M}) where {M, C} = zero(Series{C,M})
 
-Base.one(::Type{Series{C,M}}) where {M, C} = Series{C,M}(Dict(zeros(Int, length(vars)) => one(C)), vars)
+Base.one(::Type{Series{C,M}}) where {M, C} = Series{C,M}(OrderedDict(zeros(Int, length(vars)) => one(C)), vars)
 Base.one(p::Series{C,M}) where {M, C} = one(Series{C,M}, vars=variables(p))
 
 Base.promote_rule(::Type{Series{C,M}}, ::Type{Series{U,M}}) where {C,M,U} = Series{promote_type(C, U),M}
@@ -74,7 +75,7 @@ function convert(P::Type{Series{C,M}}, p::Series) where {M, C}
 end
 
 Base.convert(::Type{Series{C,M}}, c::C) where {C, M} =
-    Series{C,M}(Dict(M() => c))
+    Series{C,M}(OrderedDict(M() => c))
 
 Base.getindex(p::Series{C,M}, m::M) where {C, M} =
     get(p.terms, m, zero(C))

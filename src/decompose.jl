@@ -10,43 +10,48 @@ eps_rkf = eps::Float64 -> function (S)
   end
   i-1;
 end
-
 cst_rkf = r::Int64 -> function (S) return r end
 
-
-# Decomposition of the pencil of matrices
-function decompose(H::Vector{Matrix{C}}, rkf::Function ) where C
-
-    U, S, V = svd(H[1])       # H0= U*diag(S)*V'
-    r = rkf(S)
-
-    Sr = S[1:r]
-    Sinv = diagm(0 => [one(C)/S[i] for i in 1:r])
-
-    M = []
-    for i in 2:length(H)
-    	push!(M, Sinv*conj(U[:,1:r]')*H[i]*V[:,1:r] )
-    end
-
+function diagonalization(M::Vector{Matrix{C}}) where C
     n  = length(M)
-    M0 = sum(M[i]*rand(Float64) for i in 1:n)
+    r  = size(M[1],1)
 
-    E = eigvecs(M0)
+    M1 = sum(M[i]*randn(Float64) for i in 1:n)
+    E  = eigvecs(M1)
 
-    Xi = fill(zero(E[1,1]),n+1,r)
-    for i in 1:r
-        Xi[1,i]=1
-    end
+    Xi = fill(zero(E[1,1]),n,r)
     for i in 1:r
     	for j in 1:n
-	    Xi[j+1,i] = (E[:,i]\(M[j]*E[:,i]))[1]
+	    Xi[j,i] = (E[:,i]\(M[j]*E[:,i]))[1]
 	end
     end
+    return Xi, E
+end
 
-    X = (U[:,1:r].* Sr')*E
-    Y = (E \ V[:,1:r]')'
+ 
+# Decomposition of the pencil of matrices
+function decompose(H::Vector{Matrix{C}}, lambda::Vector, rkf::Function) where C
+    n = length(H)
+    
+    H0 = sum(H[i]*lambda[i] for i in 1:length(lambda))
 
-    return Xi, X, Y
+    U, S, V = svd(H0)       # H0= U*diag(S)*V'
+    r = rkf(S)
+
+    Sr  = S[1:r]
+    Sri = diagm([one(C)/S[i] for i in 1:r])
+
+    M = Matrix{C}[]
+    for i in 1:length(H)
+    	push!(M, Sri*conj(U[:,1:r]')*H[i]*V[:,1:r])
+    end
+
+    Xi, E = diagonalization(M)
+
+    Uxi = (U[:,1:r].*Sr')*E
+    Vxi = (E\ V[:,1:r]')
+
+    return Xi, Uxi, Vxi
 end
 
 #------------------------------------------------------------------------
@@ -65,35 +70,41 @@ The optional argument `rkf` is the rank function used to determine the numerical
 
 If the rank function cst_rkf(r) is used, the SVD is truncated at rank r.
 """
-function decompose(sigma::Series{R,M}, rkf::Function = eps_rkf(1.e-6)) where {R, M}
+function decompose(sigma::Series{R,M}, rkf::Function = eps_rkf(1.e-6), weps::Float64=1.e-5) where {R, M}
     d = maxdegree(sigma)
     X = variables(sigma)
 
-    B0 = monoms(X, div(d-1,2))
-    B1 = monoms(X, div(d-1,2))
+    d0 = div(d-1,2); d1 = d-1-d0
+    B0 = monomials(X, seq(0:d0))
+    B1 = monomials(X, seq(0:d1))
 
     H = Matrix{R}[hankel(sigma, B0, B1)]
     for x in X
         push!(H, hankel(sigma, B0, [b*x for b in B1]))
     end
 
-    Xi, X, Y = decompose(H, rkf)
+    lambda = [1.0]
+    Xi, Uxi, Vxi = decompose(H, lambda,  rkf)
 
-    r = size(Xi,2)
+    n, r = size(Xi)
+    
     w = fill(one(eltype(Xi)),r)
 
     for i in 1:r
         w[i] = Xi[1,i]
         Xi[:,i]/= Xi[1,i]
-        w[i]*= X[1,i]
-        w[i]*= Y[1,i]
+        w[i]*= Uxi[1,i]*Vxi[i,1]
     end
 
-    return w, Xi[2:end,:]
+    # remove weights below threshold weps
+    I = Bool[abs(w[i])>weps for i in 1:length(w)]
+    return w[I], Xi[2:end,I]
 
 end
+
 
 #------------------------------------------------------------------------
-function normlz(M,i)
+function normlz(M::AbstractMatrix,i)
     diagm(0 => [1/M[i,j] for j in 1:size(M,1)])*M
 end
+

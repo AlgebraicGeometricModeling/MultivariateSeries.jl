@@ -1,4 +1,4 @@
-export moment, exp, log, series, dual, moment, sparse_pol, sparse_decompose;
+export moment, exp, log, series, dual, sparse_pol, sparse_decompose;
 
 
 #----------------------------------------------------------------------
@@ -117,7 +117,7 @@ Compute the series of the moment sequence ``∑_i ω_{i} P_{i}^α`` for ``|α| \
 """
 function series(w::Vector{C}, P::AbstractMatrix, X, d::Int64) where C
     h = moment(w,P)
-    L = monoms(X,d)
+    L = monomials(X,seq(0:d))
    series(h,L)
 end
 
@@ -131,7 +131,7 @@ Compute the series of moments ``p(ζ^α)`` for ``|α| \\leq d``.
 """
 function series(p::Polynomial, zeta, X, d::Int64)
     h = moment(p,zeta)
-    L = monoms(X,d)
+    L = monomials(X,seq(0:d))
     series(h,L)
 end
 
@@ -150,7 +150,7 @@ end
 
 #------------------------------------------------------------------------
 function sparse_decompose(f, zeta, X, d:: Int64)
-    sigma = series(moment(f,zeta), monoms(X,d))
+    sigma = series(moment(f,zeta), monomials(X,seq(0:d)))
     w, Xi = decompose(sigma)
     w, log(Xi,zeta)
 end
