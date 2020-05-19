@@ -4,11 +4,16 @@ and polynomial-exponential decomposition.
 
 ## Installation
 
-To install the package within julia:
+To install the latest version of the package within julia:
 
 ```julia
-using Pkg
-Pkg.clone("https://github.com/bmourrain/MultivariateSeries.jl.git")
+] add https://github.com/bmourrain/MultivariateSeries.jl.git
+```
+
+or the registered package
+
+```julia
+] add MultivariateSeries
 ```
 
 ## Example
