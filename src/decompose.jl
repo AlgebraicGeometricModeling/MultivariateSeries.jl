@@ -46,7 +46,7 @@ function diagonalization_iter(D)
     return X, Y
 end
 
-function diagonalization(M::Vector{Matrix{C}}) where C
+function diagonalization(M::Vector{Matrix{C}}, N=10, eps=1.e-3) where C
     n  = length(M)
     r  = size(M[1],1)
 
@@ -58,11 +58,9 @@ function diagonalization(M::Vector{Matrix{C}}) where C
     D  = vcat([Matrix{C}(I,r,r)],[F*M[i]*E for i in 1:length(M)])
     err = sum(norm_off.(D))
     delta = sum(norm.(D))
-    println("diag off: ", err, "  ",delta)
+    println("diag off: ", err)
 
     if err/delta > 5.e-2
-        N = 10
-        eps= 1.e-3
         nit = 0
         delta = err
         while nit < N && delta > eps
@@ -74,8 +72,9 @@ function diagonalization(M::Vector{Matrix{C}}) where C
             nit+=1
             err = sum(norm_off.(D))
             delta = err0-err
-            println("Off", nit,": ", err, "   delta: ",delta)
+            #println("Off", nit,": ", err, "   delta: ", delta)
         end
+        println("diag off: ", err, "  N: ",nit)
     end
     Xi = fill(zero(E[1,1]),n,r)
     for i in 1:r
