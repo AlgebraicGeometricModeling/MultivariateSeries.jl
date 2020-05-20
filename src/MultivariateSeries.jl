@@ -9,6 +9,7 @@ include("series.jl")
 include("moments.jl")
 include("hankel.jl")
 include("newton.jl")
+include("diagonalisation.jl")
 include("decompose.jl")
 
 export Seq, seq
