@@ -31,12 +31,13 @@ function ms_decompose(H::Vector{Matrix{C}}, lambda::Vector, rkf::Function) where
     	push!(M, Sri*conj(U[:,1:r]')*H[i]*V[:,1:r])
     end
 
-    Xi, E = diagonalization(M)
+    Xi, E, DiagInfo = diagonalization(M)
 
     Uxi = (U[:,1:r].*Sr')*E
     Vxi = (E\ V[:,1:r]')
 
-    return Xi, Uxi, Vxi
+    Info = Dict{String,Any}( "diagonalization" => DiagInfo)
+    return Xi, Uxi, Vxi, Info
 end
 
 #------------------------------------------------------------------------
@@ -55,7 +56,9 @@ The optional argument `rkf` is the rank function used to determine the numerical
 
 If the rank function cst_rkf(r) is used, the SVD is truncated at rank r.
 """
-function ms_decompose(sigma::Series{R,M}, rkf::Function = eps_rkf(1.e-6), weps::Float64=1.e-5) where {R, M}
+function ms_decompose(sigma::Series{R,M},
+                      rkf::Function = eps_rkf(1.e-6),
+                      weps::Float64=1.e-5) where {R, M}
     d = maxdegree(sigma)
     X = variables(sigma)
 

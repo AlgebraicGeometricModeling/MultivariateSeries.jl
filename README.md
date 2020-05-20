@@ -29,15 +29,15 @@ r = 4
 Xi0 = randn(n,r)
 w0  = rand(r)
 
-L = monoms(X,5)
+L = monomials(X,seq(0:5))
 sigma = series(w0, Xi0, L)
 
 
-L2 = monoms(X,2)
-L3 = monoms(X,3)
+L2 = monomials(X,seq(0:2))
+L3 = monomials(X,seq(0:3))
 H = hankel(sigma, L2, L3)
 
-w, Xi = decompose(sigma)
+w, Xi = ms_decompose(sigma)
 ```
 
 ## Documentation

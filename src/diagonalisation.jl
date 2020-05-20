@@ -33,9 +33,15 @@ function diagonalization_iter(D)
     return X, Y
 end
 
-function diagonalization(M::Vector{Matrix{C}}, N=10, eps=1.e-3) where C
+function diagonalization(M::Vector{Matrix{C}},
+                         Info = Dict{String,Any}(
+                             "maxIter" => 10,
+                             "epsIter" => 1.e-3)) where C
     n  = length(M)
     r  = size(M[1],1)
+
+    N   = (haskey(Info,"maxIter") ? Info["maxIter"] : 10)
+    eps = (haskey(Info,"epsIter") ? Info["epsIter"] : 1.e-3)
 
     M1 = sum(M[i]*randn(Float64) for i in 1:n)
     E  = eigvecs(M1)
@@ -45,10 +51,12 @@ function diagonalization(M::Vector{Matrix{C}}, N=10, eps=1.e-3) where C
     D  = vcat([Matrix{C}(I,r,r)],[F*M[i]*E for i in 1:length(M)])
     err = sum(norm_off.(D))
     delta = sum(norm.(D))
-    println("diag off: ", err)
+    #println("diag off: ", err)
+
+    Info["off0"] = err
+    nit = 0
 
     if err/delta > 5.e-2
-        nit = 0
         delta = err
         while nit < N && delta > eps
             err0 = err
@@ -61,8 +69,10 @@ function diagonalization(M::Vector{Matrix{C}}, N=10, eps=1.e-3) where C
             delta = err0-err
             #println("Off", nit,": ", err, "   delta: ", delta)
         end
-        println("diag off: ", err, "  N: ",nit)
+        Info["off*"]= err
     end
+    Info["nIter"] = nit
+    
     Xi = fill(zero(E[1,1]),n,r)
     for i in 1:r
     	for j in 1:n
@@ -70,6 +80,6 @@ function diagonalization(M::Vector{Matrix{C}}, N=10, eps=1.e-3) where C
             #Xi[j,i] =(E[:,i]\(M[j]*E[:,i]))[1]
 	end
     end
-    return Xi, E
+    return Xi, E, Info
 end
 
