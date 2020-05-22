@@ -1,7 +1,5 @@
 export ms_decompose, cst_rkf, eps_rkf, weights, normlz
 
-import LinearAlgebra: diagm
-
 #------------------------------------------------------------------------
 eps_rkf = eps::Float64 -> function (S)
   i :: Int = 1;
