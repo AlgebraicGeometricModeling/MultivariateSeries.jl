@@ -26,9 +26,9 @@ function ms_decompose(H::Vector{Matrix{C}}, lambda::Vector, rkf::Function) where
 
     M = Matrix{C}[]
     for i in 1:length(H)
-    	push!(M, Sri*conj(U[:,1:r]')*H[i]*V[:,1:r])
+    	push!(M, Sri*(U[:,1:r]')*H[i]*(V[:,1:r]))
     end
-
+    
     Xi, E, DiagInfo = diagonalization(M)
 
     Uxi = (U[:,1:r].*Sr')*E

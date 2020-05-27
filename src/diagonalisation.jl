@@ -53,7 +53,7 @@ function diagonalization(M::Vector{Matrix{C}},
     delta = sum(norm.(D))
     #println("diag off: ", err)
 
-    Info["off0"] = err
+    Info["d0"] = err
     nit = 0
 
     if err/delta > 5.e-2
@@ -69,7 +69,7 @@ function diagonalization(M::Vector{Matrix{C}},
             delta = err0-err
             #println("Off", nit,": ", err, "   delta: ", delta)
         end
-        Info["off*"]= err
+        Info["d*"]= err
     end
     Info["nIter"] = nit
     
