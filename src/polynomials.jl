@@ -92,11 +92,11 @@ end
  return the inverse monomial with opposite exponents.
 """
 function Base.inv(m:: Monomial{true})
-    Monomial{true}(m.vars,-m.z)
+    Monomial(m.vars,-m.z)
 end
 
 function Base.inv(v:: PolyVar{true})
-    inv(Monomial{true}(v))
+    inv(Monomial(v))
 end
 
 function inv!(m:: Monomial{true})

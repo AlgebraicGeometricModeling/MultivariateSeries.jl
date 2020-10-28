@@ -12,6 +12,8 @@ import Base:
     show, print, length, getindex, setindex!, copy, promote_rule, convert, eltype, iterate,
     *, /, //, -, +, ==, ^, divrem, conj, rem, real, imag, diff
 
+import Base: (&), (|)
+
 import LinearAlgebra: dot,  norm #,  scale!
 #----------------------------------------------------------------------
 """
@@ -33,6 +35,14 @@ mutable struct Series{C,M}
     end
     function Series{C,M}(t::OrderedDict{M,C}) where {C,M}
         new(t)
+    end
+
+    function Series{C,M}(s::Series)  where {C,M}
+        r = Series{C,M}()
+        for (m,c) in s
+            r[m] = C(c)
+        end
+        return r 
     end
 end
 #----------------------------------------------------------------------
@@ -61,7 +71,7 @@ Base.zero(::Type{Series{C,M}}) where {M, C} = Series{C,M}()
 Base.zero(p::Series{C,M}) where {M, C} = zero(Series{C,M})
 
 Base.one(::Type{Series{C,M}}) where {M, C} = Series{C,M}(OrderedDict(zeros(Int, length(vars)) => one(C)), vars)
-Base.one(p::Series{C,M}) where {M, C} = one(Series{C,M}, vars=variables(p))
+Base.one(p::Series{C,M}) where {M, C} = one(Series{C,M})
 
 Base.promote_rule(::Type{Series{C,M}}, ::Type{Series{U,M}}) where {C,M,U} = Series{promote_type(C, U),M}
 Base.promote_rule(::Type{Series{C,M}}, ::Type{U}) where {C,M,U} = Series{promote_type(C, U),M}
@@ -77,16 +87,19 @@ end
 Base.convert(::Type{Series{C,M}}, c::C) where {C, M} =
     Series{C,M}(OrderedDict(M() => c))
 
-Base.getindex(p::Series{C,M}, m::M) where {C, M} =
-    get(p.terms, m, zero(C))
+Base.getindex(s::Series{C,M}, m::M) where {C, M <: AbstractMonomial} = get(s.terms, m, zero(C))
 
-Base.getindex(p::Series, m::Int...) = p[[m...;]]
+Base.getindex(s::Series{C,M}, v::V) where {C, M, V <: AbstractVariable} =
+    get(s.terms, monomial(v), zero(C))
 
-function setindex!(p::Series{C,M}, v, m::M) where {C, M}
+
+Base.getindex(s::Series, m::Int...) = s[[m...;]]
+
+function setindex!(s::Series{C,M}, v, m::M) where {C, M}
     if isapprox(v, zero(C)) #method_exists(isapprox, (C,C)) &&
-        delete!(p.terms, m)
+        delete!(s.terms, m)
     else
-        p.terms[m] = v
+        s.terms[m] = v
     end
 end
 
@@ -153,10 +166,24 @@ function +(s::Series{C,M}...) where {C,M}
     r
 end
 
-function +(p::Series{C,M}, s::U) where {C,M,U}
-    r = copy(convert(Series{promote_type(C,U),M}, p))
-    r[1] += s
-    r
+# function +(p::Series{C,M}, s::U) where {C,M,U}
+#     r = copy(convert(Series{promote_type(C,U),M}, p))
+#     r[1] += s
+#     r
+# end
+
+function +(s1::Series{C1,M}, s2::Series{C2,M}) where {C1,C2,M}
+    C = promote_type(C1,C2)
+    r = copy(convert(Series{C,M}, s1))
+    for (m, c) in s2
+        v = r[m] + c
+        if v == zero(C)
+            delete!(terms(r), m)
+        else
+            terms(r)[m] = v
+        end
+    end
+    return r
 end
 
 +(s, p::Series) = p + s
@@ -192,6 +219,7 @@ end
 
 -(s, p::Series) = -p + s
 
+#----------------------------------------------------------------------
 
 function *(s1::Series, s2::Series)
     r = zero(s1)
@@ -316,13 +344,21 @@ function *(m0::M, s::Series{C,M}) where {C,M <: AbstractMonomial}
     return r
 end
 
-function *(t::T, s::Series{C,M}) where {C,M <: AbstractMonomial,
-                                        T<:AbstractTerm}
+function *(v::V, s::Series{C,M}) where {C,
+                                        M <: AbstractMonomial,
+                                        V <: AbstractVariable}
+    return (monomial(v)*s)
+end
+
+function *(t::T, s::Series{C,M}) where {C,
+                                        M <: AbstractMonomial,
+                                        T <:AbstractTerm}
     return coefficient(t)*(monomial(t)*s)
 end
 
-function *(p::P, s::Series{C,M}) where {C, M <:AbstractMonomial,
-                                        P<:AbstractPolynomial}
+function *(p::P, s::Series{C,M}) where {C,
+                                        M <:AbstractMonomial,
+                                        P <:AbstractPolynomial}
     r = Series{C,M}()
     for t in terms(p)
         r = r + t*s
@@ -330,6 +366,70 @@ function *(p::P, s::Series{C,M}) where {C, M <:AbstractMonomial,
     return r
 end
 
+"""
+   Term-wise product of series s by p. All the terms of s are multiplied by p
+   If s = \\sum \\sigma_m m, s & p = \\sum_m (\\sigma_m*p) m
+  
+"""
+function (&)(sigma::MultivariateSeries.Series{C,M}, p::P) where {C, M, P}
+    T = typeof(one(C)*one(P))
+    s = MultivariateSeries.Series{T,M}()
+    for (m,c) in sigma
+        nc = c*p
+        s[m]= nc
+    end
+    return s
+end
+
+function (&)(p::P, sigma::MultivariateSeries.Series{C,M}) where {C, M, P}
+    T = typeof(one(C)*one(P))
+    s = MultivariateSeries.Series{T,M}()
+    for (m,c) in sigma
+        nc = p*c
+        s[m]= nc
+    end
+    return s
+end
+
+#----------------------------------------------------------------------
+"""
+    Apply to p, the differential operator associated to s.
+    dxi^k | xi^d = binomial(d,k) xi^(d-k) if d>= k and 0 otherwise.
+"""
+function (|)(sigma::Series{C,M}, v::V) where {C,M, V<:AbstractVariable}
+    return sigma[one(v)]*v + sigma[monomial(v)]
+end
+
+function (|)(sigma::Series{C,M}, m::M) where {C,M<:AbstractMonomial}
+    X0 = variables(m)
+    p = zero(m + zero(C))
+    for (ms,cs) in sigma
+        if maxdegree(ms)<= maxdegree(m)
+            mi = copy(ms)
+            for i in 1:length(mi.z) mi.z[i] = - mi.z[i] end
+            t = cs*mi*m
+            if min(t.x.z...) >= 0
+                t *= prod(binomial(maxdegree(m,x), maxdegree(ms,x))
+                          for x in variables(ms))
+                p  = p+t
+            end
+        end
+    end
+    return p
+end
+
+function (|)(sigma::Series{C,M}, t::T) where {C,M, T<:AbstractTerm}
+    return coefficient(t)*(sigma | monomial(t))
+end
+
+function (|)(sigma::Series{C,M}, p::P) where {C,M, P<:AbstractPolynomial}
+    r = zero(C)
+    for t in p
+        r += (sigma | t) 
+    end
+    return r
+end
+#----------------------------------------------------------------------
 function Base.truncate(s::Series{C,M}, d::Int64) where {C,M}
     r = Series{C,M}()
     for (m,c) in s
@@ -378,6 +478,13 @@ function scale!(s::Series, lambda)
 end
 
 #----------------------------------------------------------------------
+function exponentvect(t, X)
+  return [maxdegree(t,x) for x in X]
+end
+#----------------------------------------------------------------------
+"""
+ Compute the primitive ``\\int_v s = v^{-1}*s``
+"""
 function integrate(s::Series{C,M}, v::V) where {C,M, V<: AbstractVariable}
     r = Series{C,M}()
     for (m,c) in s
@@ -387,9 +494,31 @@ function integrate(s::Series{C,M}, v::V) where {C,M, V<: AbstractVariable}
     return r
 end
 
+"""
+ Compute the truncated primitive ``\\int_{x_{i}} s_{| x_{i+1}=0, ...x_n=0}''
+"""
+function integrate(s::Series{C,M}, X, i::Int64) where {C,M}
+    r = Series{C,M}()
+    for (m,c) in s
+        if i==length(X) || max(exponentvect(m,X[i+1:end])...) == 0 
+            v = X[i]
+            n = m*v
+            r[n]= c
+        end
+    end
+    return r
+end
+
+function diff(s::Series{C,M}, f, x) where {C,M}
+    r = zero(C)
+    for (m,c) in s
+        df = (s | f) 
+    end
+end
 #----------------------------------------------------------------------
 """
 ```
+dot(σ::Series{C,M}, p::Variable) -> C
 dot(σ::Series{C,M}, p::Monomial) -> C
 dot(σ::Series{C,M}, p::Term) -> C
 dot(σ::Series{C,M}, p::Polynomial) -> C
@@ -397,7 +526,10 @@ dot(σ::Series{C,M}, p::Polynomial, q::Polynomial) -> C
 ```
 Compute the dot product ``‹ p, q ›_{σ} = ‹ σ | p q ›`` or  ``‹ σ | p ›`` for p, q polynomials, terms or monomials.
 Apply the linear functional `sigma` on monomials, terms, polynomials 
-""" 
+"""
+function LinearAlgebra.dot(sigma::Series{C,M}, v::V) where {C,M, V<:AbstractVariable}
+    return sigma[monomial(v)]
+end
 function LinearAlgebra.dot(sigma::Series{C,M}, m::M) where {C,M<:AbstractMonomial}
     return sigma[m]
 end
@@ -417,7 +549,6 @@ end
 function LinearAlgebra.dot(sigma::Series{C,M}, p::P, q::P) where {C,M, P}
     dot(sigma, p*q)
 end
-
 
 #----------------------------------------------------------------------
 function show(io::IO, p::Series)
@@ -455,7 +586,7 @@ function print(io::IO, p::Series{C,M}) where {M, C}
     first = true
     for (m, c) in p
         if first
-            if C <: Complex
+            if !(C <: Real)
                 if degree(m) == 0
                     print(io, "$c")
                 else
@@ -469,7 +600,7 @@ function print(io::IO, p::Series{C,M}) where {M, C}
             printmonomial(io, m)
             first = false
         else
-            if C <: Complex
+            if !(C <: Real)
                 if degree(m) == 0
                     print(io, " + $c")
                 else
