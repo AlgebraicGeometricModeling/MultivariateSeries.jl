@@ -42,7 +42,7 @@ mutable struct Series{C,M}
         for (m,c) in s
             r[m] = C(c)
         end
-        return r 
+        return r
     end
 end
 #----------------------------------------------------------------------
@@ -60,7 +60,7 @@ end
 function series(s::Vector{Pair{M,C}}) where {C <: Number, M <: AbstractMonomial}
     Series{C,M}(OrderedDict(s))
 end
-    
+
 MultivariatePolynomials.terms(p::Series) = p.terms
 MultivariatePolynomials.monomials(p::Series) = keys(p.terms)
 
@@ -369,7 +369,7 @@ end
 """
    Term-wise product of series s by p. All the terms of s are multiplied by p
    If s = \\sum \\sigma_m m, s & p = \\sum_m (\\sigma_m*p) m
-  
+
 """
 function (&)(sigma::MultivariateSeries.Series{C,M}, p::P) where {C, M, P}
     T = typeof(one(C)*one(P))
@@ -425,7 +425,7 @@ end
 function (|)(sigma::Series{C,M}, p::P) where {C,M, P<:AbstractPolynomial}
     r = zero(C)
     for t in p
-        r += (sigma | t) 
+        r += (sigma | t)
     end
     return r
 end
@@ -500,7 +500,7 @@ end
 function integrate(s::Series{C,M}, X, i::Int64) where {C,M}
     r = Series{C,M}()
     for (m,c) in s
-        if i==length(X) || max(exponentvect(m,X[i+1:end])...) == 0 
+        if i==length(X) || max(exponentvect(m,X[i+1:end])...) == 0
             v = X[i]
             n = m*v
             r[n]= c
@@ -512,7 +512,7 @@ end
 function diff(s::Series{C,M}, f, x) where {C,M}
     r = zero(C)
     for (m,c) in s
-        df = (s | f) 
+        df = (s | f)
     end
 end
 #----------------------------------------------------------------------
@@ -525,7 +525,7 @@ dot(σ::Series{C,M}, p::Polynomial) -> C
 dot(σ::Series{C,M}, p::Polynomial, q::Polynomial) -> C
 ```
 Compute the dot product ``‹ p, q ›_{σ} = ‹ σ | p q ›`` or  ``‹ σ | p ›`` for p, q polynomials, terms or monomials.
-Apply the linear functional `sigma` on monomials, terms, polynomials 
+Apply the linear functional `sigma` on monomials, terms, polynomials
 """
 function LinearAlgebra.dot(sigma::Series{C,M}, v::V) where {C,M, V<:AbstractVariable}
     return sigma[monomial(v)]
