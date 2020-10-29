@@ -173,7 +173,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Series",
     "title": "LinearAlgebra.dot",
     "category": "function",
-    "text": "dot(σ::Series{C,M}, p::Variable) -> C\ndot(σ::Series{C,M}, p::Monomial) -> C\ndot(σ::Series{C,M}, p::Term) -> C\ndot(σ::Series{C,M}, p::Polynomial) -> C\ndot(σ::Series{C,M}, p::Polynomial, q::Polynomial) -> C\n\nCompute the dot product  p q _σ =  σ  p q  or   σ  p  for p, q polynomials, terms or monomials. Apply the linear functional sigma on monomials, terms, polynomials \n\n\n\n\n\n"
+    "text": "dot(σ::Series{C,M}, p::Variable) -> C\ndot(σ::Series{C,M}, p::Monomial) -> C\ndot(σ::Series{C,M}, p::Term) -> C\ndot(σ::Series{C,M}, p::Polynomial) -> C\ndot(σ::Series{C,M}, p::Polynomial, q::Polynomial) -> C\n\nCompute the dot product  p q _σ =  σ  p q  or   σ  p  for p, q polynomials, terms or monomials. Apply the linear functional sigma on monomials, terms, polynomials\n\n\n\n\n\n"
 },
 
 {
