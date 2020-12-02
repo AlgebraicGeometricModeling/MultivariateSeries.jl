@@ -440,6 +440,21 @@ function Base.truncate(s::Series{C,M}, d::Int64) where {C,M}
     return r
 end
 #----------------------------------------------------------------------
+function restrict(s::Series{C,M}, X, T) where {C,M}
+    r = Series{C,M}()
+    I = indexin(vec(T),vec(X))
+    J = setdiff(1:length(X), I)
+    t = length(J)
+    for (m,c) in s
+        e = exponents(m)
+        if e[J] == zeros(t)
+            new_m = prod([X[i]^e[i] for i in I])
+            r[new_m]= c
+        end
+    end
+    return r
+end
+#----------------------------------------------------------------------
 function ==(p::Series, q::Series)
     for (m, c) in p
         if !isapprox(q[m], c)
