@@ -157,16 +157,17 @@ julia> p([1.0,0.5])
 1.5
 ```
 """ 
-function (p::Polynomial{B,T})(x::Vector) where {B,T}
-   r = zero(x[1]);
-   for m in p
-      t=m.α
-      for i in 1:length(m.x.z)
-      	 t*=x[i]^m.x.z[i]
-      end
-      r+=t
-   end
-   r
+function (p::Polynomial{B,T})(x::AbstractVector, X=variables(p)) where {B,T}
+    return p([X[i]=>x[i] for i in 1:length(x)]...)
+    # r = zero(x[1]);
+    # for m in p
+    #    t=m.α
+    #    for i in 1:length(m.x.z)
+    #    	 t*=x[i]^m.x.z[i]
+    #    end
+    #    r+=t
+    # end
+    # r
 end
 
 #----------------------------------------------------------------------

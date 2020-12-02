@@ -423,7 +423,7 @@ function (|)(sigma::Series{C,M}, t::T) where {C,M, T<:AbstractTerm}
 end
 
 function (|)(sigma::Series{C,M}, p::P) where {C,M, P<:AbstractPolynomial}
-    r = zero(C)
+    r = zero(P)
     for t in p
         r += (sigma | t) 
     end
