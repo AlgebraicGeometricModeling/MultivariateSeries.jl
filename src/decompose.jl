@@ -28,9 +28,18 @@ function ms_decompose(H::Vector{Matrix{C}}, lambda::Vector, rkf::Function) where
     for i in 1:length(H)
     	push!(M, Sri*(U[:,1:r]')*H[i]*(V[:,1:r]))
     end
-    
-    Xi, E, DiagInfo = diagonalization(M)
 
+    if r > 1
+        Xi, E, DiagInfo = diagonalization(M)
+    else
+        Xi = fill(zero(C),n,r)
+        for i in 1:n
+            Xi[i,1] = M[i][1,1]
+        end
+        E  = fill(1.0,1,1)
+        DiagInfo = Dict{String,Any}( "case" => "1x1" )
+    end
+    
     Uxi = (U[:,1:r].*Sr')*E
     Vxi = (E\ V[:,1:r]')
 

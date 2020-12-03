@@ -1,7 +1,11 @@
 
 # norm of off diagonal terms of a square matrix
 function norm_off(M)
-    sqrt(sum(abs(M[i,j])^2 + abs(M[j,i])^2 for i in 1:size(M,1) for j in i+1:size(M,1)))
+    if size(M[1],1)>1
+        return sqrt(sum(abs(M[i,j])^2 + abs(M[j,i])^2 for i in 1:size(M,1) for j in i+1:size(M,1)))
+    else
+        return 0.0
+    end
 end
 
 function diagonalization_iter(D)
