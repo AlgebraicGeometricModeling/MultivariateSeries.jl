@@ -33,11 +33,11 @@ L = monomials(X,seq(0:5))
 sigma = series(w0, Xi0, L)
 
 
-L2 = monomials(X,seq(0:2))
-L3 = monomials(X,seq(0:3))
+L2 = monomials(X,0:2)
+L3 = monomials(X,0:3)
 H = hankel(sigma, L2, L3)
 
-w, Xi = ms_decompose(sigma)
+w, Xi = decompose(sigma)
 ```
 
 ## Documentation
