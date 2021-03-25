@@ -80,7 +80,7 @@ function decompose(sigma::Series{R,M},
     end
 
     lambda = [1.0]
-    Xi, Uxi, Vxi = decompose_pencil(H, lambda,  rkf)
+    Xi, Uxi, Vxi = decompose(H, lambda,  rkf)
 
     n, r = size(Xi)
     
