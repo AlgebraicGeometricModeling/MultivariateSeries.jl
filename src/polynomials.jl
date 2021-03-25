@@ -1,4 +1,4 @@
-export @ring, deg, monoms, exponent
+export @ring, deg, monoms, exponent, matrixof, prodvec, prodset
 
 import DynamicPolynomials: maxdegree, monomials
 import LinearAlgebra: norm
@@ -190,4 +190,47 @@ function LinearAlgebra.norm(pol::Polynomial{B,T}, p::Int64=2) where {B,T}
     r=sum(abs(t.α)^p for t in pol)
     exp(log(r)/p)
 end
+
 #----------------------------------------------------------------------
+"""
+ Coefficient matrix of the polynomials in P with respect to the monomial vector L
+"""
+function matrixof(P::Vector{Polynomial{B,C}}, L ) where {B,C}
+
+    M = fill(zero(C), length(P), length(L))
+    idx = Dict{Monomial{true},Int64}()
+    for i in 1:length(L)
+        idx[L[i]] = i
+    end
+
+    for i in 1:length(P)
+        for t in P[i]
+            j = get(idx,monomial(t),0)
+            if j!=0 M[i,j]=coefficient(t) end
+        end
+    end
+    M
+end
+
+"""
+ Product-wise vector of X by Y ordered by row: [x1*y1, x1*y2, ..., x2*y1, ....] 
+"""
+function prodvec(X, Y)
+    res = typeof(X[1])[]
+    [x*y for x in X for y in Y]
+end
+
+"""
+ Product-wise vector of X by Y ordered by row with no repetition: 
+    if xi*yj appears as xi'*yj' with i'<i or i'=i and j'<j it is not inserted.
+"""
+function prodset(X, Y)
+    res = typeof(X[1])[]
+    for x in X
+        for y in Y
+            m = x*y
+            if !in(m,res) push!(res, m) end
+        end
+    end
+    res
+end

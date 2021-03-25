@@ -1,4 +1,4 @@
-export ms_decompose, cst_rkf, eps_rkf, weights, normlz
+export decompose, ms_decompose, cst_rkf, eps_rkf, weights, normlz
 
 #------------------------------------------------------------------------
 eps_rkf = eps::Float64 -> function (S)
@@ -13,7 +13,7 @@ cst_rkf = r::Int64 -> function (S) return r end
 
 #------------------------------------------------------------------------
 # Decomposition of the pencil of matrices
-function ms_decompose(H::Vector{Matrix{C}}, lambda::Vector, rkf::Function) where C
+function decompose(H::Vector{Matrix{C}}, lambda::Vector, rkf::Function) where C
     n = length(H)
     
     H0 = sum(H[i]*lambda[i] for i in 1:length(lambda))
@@ -50,7 +50,7 @@ end
 #------------------------------------------------------------------------
 """
 ```
-ms_decompose(σ :: Series{C,M}, rkf :: Function)
+decompose(σ :: Series{C,M}, rkf :: Function)
 ```
 Decompose the series ``σ`` as a weighted sum of exponentials.
 Return ``ω``, ``Ξ`` where
@@ -63,9 +63,10 @@ The optional argument `rkf` is the rank function used to determine the numerical
 
 If the rank function cst_rkf(r) is used, the SVD is truncated at rank r.
 """
-function ms_decompose(sigma::Series{R,M},
-                      rkf::Function = eps_rkf(1.e-6),
-                      weps::Float64=1.e-5) where {R, M}
+function decompose(sigma::Series{R,M},
+                   rkf::Function = eps_rkf(1.e-6),
+                   weps::Float64=1.e-5) where {R, M}
+
     d = maxdegree(sigma)
     X = variables(sigma)
 
@@ -79,7 +80,7 @@ function ms_decompose(sigma::Series{R,M},
     end
 
     lambda = [1.0]
-    Xi, Uxi, Vxi = ms_decompose(H, lambda,  rkf)
+    Xi, Uxi, Vxi = decompose_pencil(H, lambda,  rkf)
 
     n, r = size(Xi)
     
@@ -97,6 +98,12 @@ function ms_decompose(sigma::Series{R,M},
 
 end
 
+#------------------------------------------------------------------------
+function ms_decompose(sigma::Series{R,M},
+                      rkf::Function = eps_rkf(1.e-6),
+                      weps::Float64=1.e-5) where {R, M}
+    return decompose(sigma,rkf,weps)
+end
 #------------------------------------------------------------------------
 function normlz(M::AbstractMatrix,i)
     diagm(0 => [1/M[i,j] for j in 1:size(M,1)])*M
