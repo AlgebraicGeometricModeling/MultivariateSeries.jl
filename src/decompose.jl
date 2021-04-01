@@ -15,7 +15,7 @@ cst_rkf = r::Int64 -> function (S) return r end
 # Decomposition of the pencil of matrices
 function decompose(H::Vector{Matrix{C}}, lambda::Vector, rkf::Function) where C
     n = length(H)
-    
+
     H0 = sum(H[i]*lambda[i] for i in 1:length(lambda))
 
     U, S, V = svd(H0)       # H0= U*diag(S)*V'
@@ -39,7 +39,7 @@ function decompose(H::Vector{Matrix{C}}, lambda::Vector, rkf::Function) where C
         E  = fill(1.0,1,1)
         DiagInfo = Dict{String,Any}( "case" => "1x1" )
     end
-    
+
     Uxi = (U[:,1:r].*Sr')*E
     Vxi = (E\ V[:,1:r]')
 
@@ -83,7 +83,7 @@ function decompose(sigma::Series{R,M},
     Xi, Uxi, Vxi = decompose(H, lambda,  rkf)
 
     n, r = size(Xi)
-    
+
     w = fill(one(eltype(Xi)),r)
 
     for i in 1:r
@@ -108,4 +108,3 @@ end
 function normlz(M::AbstractMatrix,i)
     diagm(0 => [1/M[i,j] for j in 1:size(M,1)])*M
 end
-
