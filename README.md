@@ -7,7 +7,7 @@ and polynomial-exponential decomposition.
 To install the latest version of the package within julia:
 
 ```julia
-] add https://github.com/bmourrain/MultivariateSeries.jl.git
+] add https://github.com/AlgebraicGeometricModeling/MultivariateSeries.jl.git
 ```
 
 or the registered package
