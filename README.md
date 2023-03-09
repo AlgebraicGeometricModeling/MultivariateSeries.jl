@@ -44,9 +44,9 @@ w, Xi = decompose(sigma)
     
 [![](https://img.shields.io/badge/docs-latest-blue.svg)](https://AlgebraicGeometricModeling.github.io/MultivariateSeries.jl/)
 
-    ## Documentation
+## More information
 
-    https://github.com/AlgebraicGeometricModeling/MultivariateSeries.jl.git
+   - [source](https://github.com/AlgebraicGeometricModeling/MultivariateSeries.jl)
    - [![](https://img.shields.io/badge/docs-latest-blue.svg)](https://bmourrain.github.io/MultivariateSeries.jl/latest)
    - [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://bmourrain.github.io/MultivariateSeries.jl/dev)
    - More information on [Julia](https://julialang.org/)

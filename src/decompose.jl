@@ -22,7 +22,7 @@ function decompose(H::Vector{Matrix{C}}, lambda::Vector, rkf::Function) where C
     r = rkf(S)
 
     Sr  = S[1:r]
-    Sri = diagm([one(C)/S[i] for i in 1:r])
+    Sri = LinearAlgebra.diagm([one(C)/S[i] for i in 1:r])
 
     M = Matrix{C}[]
     for i in 1:length(H)
@@ -71,8 +71,8 @@ function decompose(sigma::Series{R,M},
     X = variables(sigma)
 
     d0 = div(d-1,2); d1 = d-1-d0
-    B0 = monomials(X, seq(0:d0))
-    B1 = monomials(X, seq(0:d1))
+    B0 = monomials(X, 0:d0)
+    B1 = monomials(X, 0:d1)
 
     H = Matrix{R}[hankel(sigma, B0, B1)]
     for x in X
@@ -106,5 +106,5 @@ function ms_decompose(sigma::Series{R,M},
 end
 #------------------------------------------------------------------------
 function normlz(M::AbstractMatrix,i)
-    diagm(0 => [1/M[i,j] for j in 1:size(M,1)])*M
+    LinearAlgebra.diagm(0 => [1/M[i,j] for j in 1:size(M,1)])*M
 end

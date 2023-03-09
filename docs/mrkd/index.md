@@ -8,19 +8,15 @@ The package `MultivariateSeries.jl` provides tools for the manipulation of seque
 ``(\sigma_{\alpha})_{\alpha} \in \mathbb{K}^{\mathbb{N}^{n}}`` indexed by multivariate
 indices ``\alpha \in {\mathbb{N}^{n}}`` which are represented as series: 
 ```math
-     \sigma(\mathbf{z}) = \sum_{\alpha \in {\mathbb{N}^{n}}} \sigma_{\alpha} \mathbf{z}^{\alpha}
-```
-Sometimes it is preferrable to associate the following series in ``\mathbf{y}`` to the sequence ``\sigma``:
-```math
-\sigma(\mathbf{y}) = \sum_{\alpha \in {\mathbb{N}^{n}}} \sigma_{\alpha} \frac{\mathbf{y}^{\alpha}}{\alpha!}
+     \sigma(\mathbf{z}) = \sum_{\alpha \in {\mathbb{N}^{n}}} \sigma_{\alpha} \mathbf{y}^{\alpha}
 ```
     
-The sequence ``\sigma`` or the series ``\sigma(z)`` represents a linear functional on the polynomials:
+The sequence ``\sigma`` or the series ``\sigma(y)`` represents a linear functional on the polynomials:
 ```math
      \sigma: p= \sum_{\alpha \in \mathbb{N}^n} p_{\alpha} \mathbf{x}^{\alpha} \mapsto \sum_{\alpha \in \mathbb{N}^n} p_{\alpha} \sigma_{\alpha}
 ```
-The series are represented as association tables (or dictionnary) between (a finite set of) monomials and coefficients.
-They are printed using dual variables `dxi`:
+The series are implemented  as association tables (or dictionnaries) between (a finite set of) monomials and coefficients.
+They are printed using dual variables `dxi`=$y_i$:
 
     using MultivariateSeries
     X = @ring x1 x2
@@ -81,13 +77,12 @@ Pages = map(file -> joinpath("code", file), filter(x ->endswith(x, "md"), readdi
 
 ## [Installation](@id sec_installation)
 
-The package is available at [https://github.com/bmourrain/MultivariateSeries.jl.git](https://github.com/bmourrain/MultivariateSeries.jl.git)
+The package is available at [https://github.com/AlgebraicGeometricModeling/MultivariateSeries.jl.git](https://github.com/AlgebraicGeometricModeling/MultivariateSeries.jl.git)
 
 
 To install it from Julia:
 ```julia
-using Pkg
-Pkg.clone("https://github.com/bmourrain/MultivariateSeries.jl.git")
+] add https://github.com/AlgebraicGeometricModeling/MultivariateSeries.jl.git
 ```
 It can then be used as follows:
 ```julia
