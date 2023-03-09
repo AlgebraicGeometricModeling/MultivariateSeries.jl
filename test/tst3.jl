@@ -4,7 +4,7 @@ X = @ring x1 x2
 n = length(X)
 r = 5
 
-L = monoms(X,5)
+L = monomials(X,0:5)
 
 Xi0 = rand(2,r)
 w0  = rand(r)

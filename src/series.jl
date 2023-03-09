@@ -295,7 +295,7 @@ end
 #----------------------------------------------------------------------
 """
 ```
- inv(m :: Monomial)
+inv(m :: Monomial)
 ```
  return the inverse monomial with opposite exponents.
 """
@@ -314,12 +314,12 @@ end
 
 #----------------------------------------------------------------------
 """
-```
- *(v::Variable,   σ::Series{C,M}) -> Series{C,M}
- *(m::Monomial,   σ::Series{C,M}) -> Series{C,M}
- *(t::Term,       σ::Series{C,M}) -> Series{C,M}
- *(p::Polynomial, σ::Series{C,M}) -> Series{C,M}
-```
+
+     *(v::Variable,   σ::Series{C,M}) -> Series{C,M}
+     *(m::Monomial,   σ::Series{C,M}) -> Series{C,M}
+     *(t::Term,       σ::Series{C,M}) -> Series{C,M}
+     *(p::Polynomial, σ::Series{C,M}) -> Series{C,M}
+
 The dual product (or co-product) where variables are inverted in the polynomial and the monomials with positive exponents are kept in the series.
 """
 function *(v::V, s::Series{C,M}) where {V <: AbstractVariable, C,M}
@@ -368,7 +368,7 @@ end
 
 """
    Term-wise product of series s by p. All the terms of s are multiplied by p
-   If s = \\sum \\sigma_m m, s & p = \\sum_m (\\sigma_m*p) m
+           If σ = ∑ σ_m m, s & p = ∑_m (σ_m*p) m
 
 """
 function (&)(sigma::MultivariateSeries.Series{C,M}, p::P) where {C, M, P}
@@ -471,6 +471,8 @@ end
 
 #----------------------------------------------------------------------
 """
+    scale(σ,λ)
+
 Scale the moments ``σ_α`` by ``λ^{deg(α)}``.
 """
 function scale(sigma::Series, lambda)
@@ -483,6 +485,8 @@ end
 
 #----------------------------------------------------------------------
 """
+    scale!(σ,λ)
+
 Scale the moments ``σ_α`` by ``λ^{deg(α)}``, overwriting ``σ``
 """
 function scale!(s::Series, lambda)
@@ -532,13 +536,13 @@ function diff(s::Series{C,M}, f, x) where {C,M}
 end
 #----------------------------------------------------------------------
 """
-```
-dot(σ::Series{C,M}, p::Variable) -> C
-dot(σ::Series{C,M}, p::Monomial) -> C
-dot(σ::Series{C,M}, p::Term) -> C
-dot(σ::Series{C,M}, p::Polynomial) -> C
-dot(σ::Series{C,M}, p::Polynomial, q::Polynomial) -> C
-```
+
+    dot(σ::Series{C,M}, p::Variable) -> C
+    dot(σ::Series{C,M}, p::Monomial) -> C
+    dot(σ::Series{C,M}, p::Term) -> C
+    dot(σ::Series{C,M}, p::Polynomial) -> C
+    dot(σ::Series{C,M}, p::Polynomial, q::Polynomial) -> C
+
 Compute the dot product ``‹ p, q ›_{σ} = ‹ σ | p q ›`` or  ``‹ σ | p ›`` for p, q polynomials, terms or monomials.
 Apply the linear functional `sigma` on monomials, terms, polynomials
 """

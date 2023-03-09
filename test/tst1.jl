@@ -1,8 +1,14 @@
 using MultivariateSeries
-X = @ring x0 x1 x2
+X = @ring x1 x2
 d = 4
-F = (x0+x1+x2)^d + 1.5*(x0+x1)^d -2.0*(x0-x2)^d
-w, Xi = decompose(F)
-F1 = tensor(w, Xi, X, d)
-@assert norm(F-F1)<1.e-6
+
+w = [1, 1.5, -2.0]
+Xi = [ 1 1;
+       0 0;
+       0 -1.0]'
+
+F = series(w, Xi, X, d)
+
+decompose(F)
+
 

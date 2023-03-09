@@ -107,14 +107,14 @@ function isprimal(m::Monomial{true})
     return !any(t->t<0, m.z)
 end
 #-----------------------------------------------------------------------
-"""
+#= """
 ```
 monoms(V, d::Int64) -> Vector{Monomial}
 monoms(V, rg::UnitRangeInt64) -> Vector{Monomial}
 ```
 List of all monomials in the variables V up to degree d of from degree d1 to d2,
 ordered by increasing degree.
-"""
+""" =#
 function monoms(V::Vector{PolyVar{true}}, rg::UnitRange{Int64})
     L = DynamicPolynomials.Monomial{true}[]
     for i in rg
@@ -124,13 +124,13 @@ function monoms(V::Vector{PolyVar{true}}, rg::UnitRange{Int64})
 end
 
 #-----------------------------------------------------------------------
-"""
+#= """
 ```
 monoms(V, d::Int64) -> Vector{Monomial}
 ```
 List of all monomials in the variables V up to degree d of from degree d1 to d2,
 ordered by increasing degree.
-"""
+""" =#
 function monoms(V::Vector{PolyVar{true}}, d ::Int64)
     if (d>0)
         monoms(V,0:d)
@@ -213,7 +213,8 @@ function matrixof(P::Vector{Polynomial{B,C}}, L ) where {B,C}
 end
 
 """
- Product-wise vector of X by Y ordered by row: [x1*y1, x1*y2, ..., x2*y1, ....] 
+    prodvec(X,Y)
+Product-wise vector of X by Y ordered by row: [x1*y1, x1*y2, ..., x2*y1, ....] 
 """
 function prodvec(X, Y)
     res = typeof(X[1])[]
@@ -221,7 +222,9 @@ function prodvec(X, Y)
 end
 
 """
- Product-wise vector of X by Y ordered by row with no repetition: 
+    prodsect(X,Y)
+
+Product-wise vector of X by Y ordered by row with no repetition: 
     if xi*yj appears as xi'*yj' with i'<i or i'=i and j'<j it is not inserted.
 """
 function prodset(X, Y)

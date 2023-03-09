@@ -1,13 +1,12 @@
-using MultivariateSeries
+using MultivariateSeries, LinearAlgebra
 
+X = @ring x y z
 r  = 4
 w0 = rand(r)
-A0 = rand(5,r)
-B0 = rand(3,r)
-C0 = rand(4,r)
+A0 = rand(3,r)
 
-T0 = tensor(w0, A0, B0, C0)
-w, A, B, C = decompose(T0, eps_rkf(1.e-10), mode=2)
+T0 = series(w0, A0, X, d)
+w, A = decompose(T0, eps_rkf(1.e-10))
 
-T = tensor(w, A, B, C)
+T = series(w, A, X, d)
 @assert norm(T-T0)< 1.e-6
