@@ -1,7 +1,9 @@
 export @ring, deg, monoms, exponent, matrixof, prodvec, prodset
 
 import DynamicPolynomials: maxdegree, monomials
-import LinearAlgebra: norm
+
+using LinearAlgebra
+#import LinearAlgebra: norm, dot
 
 function buildpolvar(::Type{PV}, arg, var) where PV
     :($(esc(arg)) = $var)
@@ -27,13 +29,14 @@ macro ring(args...)
 end
 
 #----------------------------------------------------------------------
+#=
 """
 ```
 deg(p:Polynomial) -> Int64
 ```
 Degree of a polynomial
 """
-function deg(p::Polynomial{B,T}) where {B,T}
+function deg(p::DynamicPolynomials.Polynomial{B,T}) where {B,T}
     maxdegree(p.x)
 end
 
@@ -46,7 +49,7 @@ function deg(m::Monomial{C}) where C
     sum(m.z)
 end
 #----------------------------------------------------------------------
-function deg(v::PolyVar{T}) where T
+function deg(v::DynamicPolynomials.PolyVar{T}) where T
     1
 end
 #----------------------------------------------------------------------
@@ -57,6 +60,7 @@ end
 function coeff(t::Term{B,T}) where {B,T}
     exponent(t.α)
 end
+=#
 #----------------------------------------------------------------------
 function Base.one(::Type{Monomial{true}})
     Monomial{true}()
@@ -91,11 +95,11 @@ end
 ```
  return the inverse monomial with opposite exponents.
 """
-function Base.inv(m:: Monomial{true})
+function Base.inv(m::Monomial{true})
     Monomial(m.vars,-m.z)
 end
 
-function Base.inv(v:: PolyVar{true})
+function Base.inv(v::DynamicPolynomials.Variable{T}) where T
     inv(Monomial(v))
 end
 
@@ -107,49 +111,12 @@ function isprimal(m::Monomial{true})
     return !any(t->t<0, m.z)
 end
 #-----------------------------------------------------------------------
-#= """
-```
-monoms(V, d::Int64) -> Vector{Monomial}
-monoms(V, rg::UnitRangeInt64) -> Vector{Monomial}
-```
-List of all monomials in the variables V up to degree d of from degree d1 to d2,
-ordered by increasing degree.
-""" =#
-function monoms(V::Vector{PolyVar{true}}, rg::UnitRange{Int64})
-    L = DynamicPolynomials.Monomial{true}[]
-    for i in rg
-        append!(L, DynamicPolynomials.monomials(V,i))
-    end
-    L
-end
-
-#-----------------------------------------------------------------------
-#= """
-```
-monoms(V, d::Int64) -> Vector{Monomial}
-```
-List of all monomials in the variables V up to degree d of from degree d1 to d2,
-ordered by increasing degree.
-""" =#
-function monoms(V::Vector{PolyVar{true}}, d ::Int64)
-    if (d>0)
-        monoms(V,0:d)
-    else
-        L = monoms(V, 0:-d)
-        for i in 1:length(L)
-            inv!(L[i])
-        end
-        L
-    end
-end
-
-#-----------------------------------------------------------------------
 """
 Evaluate a polynomial p at a point x;
 
 ## Example
 ```
-julia> X = @ring x1 x2;
+julia> X = @polyvar x1 x2;
 
 julia> p = x1^2+x1*x2;
 
@@ -157,21 +124,13 @@ julia> p([1.0,0.5])
 1.5
 ```
 """ 
-function (p::Polynomial{B,T})(x::AbstractVector, X=variables(p)) where {B,T}
-    return p([X[i]=>x[i] for i in 1:length(x)]...)
-    # r = zero(x[1]);
-    # for m in p
-    #    t=m.α
-    #    for i in 1:length(m.x.z)
-    #    	 t*=x[i]^m.x.z[i]
-    #    end
-    #    r+=t
-    # end
-    # r
+function (p::DynamicPolynomials.Polynomial{B,T})(x::AbstractVector, X=variables(p)) where {B,T}
+    return subs(p,[X[i]=>x[i] for i in 1:length(x)]...)
+
 end
 
 #----------------------------------------------------------------------
-function LinearAlgebra.norm(p::Polynomial{B,T}, x::Float64) where {B,T}
+function LinearAlgebra.norm(p::AbstractPolynomial, x::Float64)
     if (x == Inf)
         r = - Inf
         for t in p
@@ -186,7 +145,7 @@ function LinearAlgebra.norm(p::Polynomial{B,T}, x::Float64) where {B,T}
     r
 end
 
-function LinearAlgebra.norm(pol::Polynomial{B,T}, p::Int64=2) where {B,T}
+function LinearAlgebra.norm(pol::AbstractPolynomial, p::Int64=2)
     r=sum(abs(t.α)^p for t in pol)
     exp(log(r)/p)
 end
@@ -195,7 +154,7 @@ end
 """
  Coefficient matrix of the polynomials in P with respect to the monomial vector L
 """
-function matrixof(P::Vector{Polynomial{B,C}}, L ) where {B,C}
+function matrixof(P::Vector{DynamicPolynomials.Polynomial{B,O,C}}, L ) where {B,O,C}
 
     M = fill(zero(C), length(P), length(L))
     idx = Dict{Monomial{true},Int64}()

@@ -4,10 +4,12 @@ using LinearAlgebra
 using MultivariatePolynomials
 using DynamicPolynomials
 
-include("polynomials.jl")
 include("series.jl")
+include("polynomials.jl")
 include("moments.jl")
 include("hankel.jl")
+include("invsys.jl")
+
 include("newton.jl")
 include("diagonalisation.jl")
 include("decompose.jl")
@@ -24,7 +26,7 @@ function seq(args...)
     end
 end
 
-function DynamicPolynomials.MonomialVector(V::Vector{PolyVar{true}}, rg::Seq)
+function DynamicPolynomials.MonomialVector(V::Vector{DynamicPolynomials.Variable}, rg::Seq)
      L = DynamicPolynomials.Monomial{true}[]
      for i in rg.val
          append!(L, DynamicPolynomials.monomials(V,i))
@@ -32,7 +34,7 @@ function DynamicPolynomials.MonomialVector(V::Vector{PolyVar{true}}, rg::Seq)
      L
 end
 
-function DynamicPolynomials.MonomialVector(V::Vector{PolyVar{true}}, rg::UnitRange{Int64})
+function DynamicPolynomials.MonomialVector(V::Vector{DynamicPolynomials.Variable}, rg::UnitRange{Int64})
      L = DynamicPolynomials.Monomial{true}[]
      for i in rg
          append!(L, DynamicPolynomials.monomials(V,i))

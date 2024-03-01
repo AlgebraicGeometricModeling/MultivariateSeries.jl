@@ -34,18 +34,45 @@ Compute the series associated to the polynomial p, replacing
 the variables xi by their dual variables dxi. C is the type of coefficients 
 of the polynomial p and M its type of monomials.
 """
-function dual(p::Polynomial{true,C}) where C
-    s = Series{C, DynamicPolynomials.Monomial{true}}()
-    for t in p
-               s[t.x] = t.α
-    end
-    return s
+function dual(p::AbstractPolynomial)
+
+    C = coefficients(p)
+    M = monomials(p)
+
+    return series([M[i]=> C[i] for i in 1:length(C) ])
+    
 end
 
-function dual(t::Term{true,T}) where T
-    s = Series{T, Monomial{true}}()
-    s[t.x] = t.α
-    return s
+function _binomial(d, alpha::Vector{Int64})
+  r = binomial(d, alpha[1])
+  for i in 2:length(alpha)
+      d -= alpha[i-1]
+      r *= binomial(d, alpha[i])
+  end
+  r
+end
+
+
+function dual(p::AbstractPolynomial, d::Int)
+
+    C = promote_type(coefficient_type(p),Rational{Int})
+    c::Vector{C} = coefficients(p)
+    m = monomials(p)
+    for i in 1:length(m)
+        c[i]/= _binomial(d,exponents(m[i]))
+    end
+    return series([m[i]=> c[i] for i in 1:length(c) ])
+end
+
+
+function dual(s::Series)
+    dot(coefficients(s), monomials(s))
+end
+
+function dual(s::Series, d::Int)
+    Mm = monomials(s)
+    Cf = coefficients(s)
+    return sum([m*(c*_binomial(d,exponents(m))) for (c,m) in zip(Cf,Mm)])
 end
 
 #----------------------------------------------------------------------
@@ -92,7 +119,7 @@ moment(p::Polynomial, zeta::Vector{C}) -> Vector{Int64} -> C
 ```
 Compute the moment function ``α \\rightarrow p(ζ^α)``.
 """
-moment(p::Polynomial, zeta::Vector) =  function(V::Vector{Int})
+moment(p::AbstractPolynomial, zeta::AbstractVector) =  function(V::Vector{Int})
     U = [zeta[i]^V[i] for i in 1:length(V)]
     p(U)
 end
@@ -129,7 +156,7 @@ series(p::Polynomial, zeta, X, d::Int64) -> Series
 ```
 Compute the series of moments ``p(ζ^α)`` for ``|α| \\leq d``.
 """
-function series(p::Polynomial, zeta, X, d::Int64)
+function series(p::DynamicPolynomials.Polynomial, zeta, X, d::Int64)
     h = moment(p,zeta)
     L = monomials(X,seq(0:d))
     series(h,L)

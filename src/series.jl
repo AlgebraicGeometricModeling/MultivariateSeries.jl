@@ -6,6 +6,7 @@
 ###
 
 using DataStructures
+
 export Series, series, zero, convert, monomials, setindex, setindex!, deg, integrate, +, -, *, /, scale, scale!
 
 import Base:
@@ -14,7 +15,7 @@ import Base:
 
 import Base: (&), (|)
 
-import LinearAlgebra: dot,  norm #,  scale!
+import LinearAlgebra: dot,  norm 
 #----------------------------------------------------------------------
 """
 ```
@@ -24,6 +25,7 @@ Class representing multivariate series. The series is a dictionary,
 which associates values of type C to monomials of type M.
 """
 mutable struct Series{C,M}
+
     terms::OrderedDict{M,C}
 
     function Series{C,M}() where {M, C}
@@ -46,7 +48,6 @@ mutable struct Series{C,M}
     end
 end
 #----------------------------------------------------------------------
-
 """
     Construct the series with the term (c,m).
 """
@@ -63,6 +64,7 @@ end
 
 MultivariatePolynomials.terms(p::Series) = p.terms
 MultivariatePolynomials.monomials(p::Series) = keys(p.terms)
+MultivariatePolynomials.coefficients(p::Series) = values(p.terms)
 
 Base.eltype(::Series{C,M}) where {M, C}  = C
 Base.length(s::Series{C,M}) where {M, C} = length(s.terms)
@@ -166,15 +168,13 @@ function +(s::Series{C,M}...) where {C,M}
     r
 end
 
-# function +(p::Series{C,M}, s::U) where {C,M,U}
-#     r = copy(convert(Series{promote_type(C,U),M}, p))
-#     r[1] += s
-#     r
-# end
+function +(s::Series{C,M}, u::U) where {C,M,U<:Number}
+    return s + series(u,one(M))
+end
 
 function +(s1::Series{C1,M}, s2::Series{C2,M}) where {C1,C2,M}
     C = promote_type(C1,C2)
-    r = copy(convert(Series{C,M}, s1))
+    r = convert(Series{C,M}, s1)
     for (m, c) in s2
         v = r[m] + c
         if v == zero(C)
@@ -189,12 +189,12 @@ end
 +(s, p::Series) = p + s
 
 #----------------------------------------------------------------------
-function -(s1::Series{C,M}, s2::Series{U,M}) where {C,M,U}
-    R = promote_type(C, U)
-    r = convert(Series{R,M}, s1)
+function -(s1::Series{C1,M}, s2::Series{C2,M}) where {C1, C2, M}
+    C = promote_type(C1, C2)
+    r = convert(Series{C,M}, s1)
     for (m, c) in s2
         v = r[m] - c
-        if v == zero(R)
+        if v == zero(C)
             delete!(terms(r), m)
         else
             terms(r)[m] = v
@@ -203,10 +203,8 @@ function -(s1::Series{C,M}, s2::Series{U,M}) where {C,M,U}
     r
 end
 
-function -(s::Series{C,M}, u::U) where {C,M,U}
-    r = copy(convert(Series{promote_type(C, U), M}, s))
-    r[zeros(Int, nvariables(s))] -= u
-    r
+function -(s::Series{C,M}, u::U) where {C,M, U <: Number }
+    return s - series(u,one(M))
 end
 
 function -(s::Series)
@@ -249,11 +247,11 @@ end
 
 
 function /(p::Series{C,M}, s::U) where {C,M, U <: Number}
-    r = zero(Series{promote_type(C,U),M})
-    for (m, c) in p
-        r[m] = c/s
-    end
-    r
+    return p*(1/s)
+end
+
+function //(p::Series{C,M}, s::U) where {C,M, U <: Number}
+    return p*(1//s)
 end
 
 function ^(s::Series, power::Integer)
@@ -275,22 +273,14 @@ function *(L::AbstractVector, v::AbstractVariable)
     [p*v for p in L]
 end
 #----------------------------------------------------------------------
+#import DynamicPolynomials: maxdegree
 """
 ```
 maxdegree(σ::Series) -> Int64
 ```
-Maximal degree of the moments defined in the series `σ`.
+Maximal degree of the monomials of the moments of the series `σ`.
 """
-function maxdegree(s::Series)
-    d = 0
-    for (m, c) in s
-        s = degree(m)
-        if s > d
-            d = s
-        end
-    end
-    d
-end
+MultivariatePolynomials.maxdegree(s::Series) = max(maxdegree.(monomials(s))...)
 
 #----------------------------------------------------------------------
 """
@@ -322,18 +312,14 @@ end
 
 The dual product (or co-product) where variables are inverted in the polynomial and the monomials with positive exponents are kept in the series.
 """
-function *(v::V, s::Series{C,M}) where {V <: AbstractVariable, C,M}
-    r = Series{C,M}()
-    for (m,c) in s
-        n = m*inv(v)
-        if isprimal(n)
-            r[n]= c
-        end
-    end
-    return r
+function *(v::V, s::Series{C,M}) where {C,
+                                        V <: AbstractVariable,
+                                        M <: AbstractMonomial}
+    return monomial(v)*s
 end
 
-function *(m0::M, s::Series{C,M}) where {C,M <: AbstractMonomial}
+function *(m0::M, s::Series{C,M}) where {C,
+                                         M <: AbstractMonomial}
     r = Series{C,M}()
     for (m,c) in s
         n = m*inv(m0)
@@ -344,15 +330,9 @@ function *(m0::M, s::Series{C,M}) where {C,M <: AbstractMonomial}
     return r
 end
 
-function *(v::V, s::Series{C,M}) where {C,
-                                        M <: AbstractMonomial,
-                                        V <: AbstractVariable}
-    return (monomial(v)*s)
-end
-
 function *(t::T, s::Series{C,M}) where {C,
                                         M <: AbstractMonomial,
-                                        T <:AbstractTerm}
+                                        T <: AbstractTerm}
     return coefficient(t)*(monomial(t)*s)
 end
 
@@ -393,42 +373,24 @@ end
 
 #----------------------------------------------------------------------
 """
-    Apply to p, the differential operator associated to s.
-    dxi^k | xi^d = binomial(d,k) xi^(d-k) if d>= k and 0 otherwise.
+    Apply to p, the dual functional associated to s.
 """
 function (|)(sigma::Series{C,M}, v::V) where {C,M, V<:AbstractVariable}
-    return sigma[one(v)]*v + sigma[monomial(v)]
+    return dot(s,v)
 end
 
 function (|)(sigma::Series{C,M}, m::M) where {C,M<:AbstractMonomial}
-    X0 = variables(m)
-    p = zero(m + zero(C))
-    for (ms,cs) in sigma
-        if maxdegree(ms)<= maxdegree(m)
-            mi = copy(ms)
-            for i in 1:length(mi.z) mi.z[i] = - mi.z[i] end
-            t = cs*mi*m
-            if min(t.x.z...) >= 0
-                t *= prod(binomial(maxdegree(m,x), maxdegree(ms,x))
-                          for x in variables(ms))
-                p  = p+t
-            end
-        end
-    end
-    return p
+    return dot(sigma,m)
 end
 
 function (|)(sigma::Series{C,M}, t::T) where {C,M, T<:AbstractTerm}
-    return coefficient(t)*(sigma | monomial(t))
+    return dot(sigma,t)
 end
 
 function (|)(sigma::Series{C,M}, p::P) where {C,M, P<:AbstractPolynomial}
-    r = zero(P)
-    for t in p
-        r += (sigma | t)
-    end
-    return r
+    return dot(sigma,p)
 end
+
 #----------------------------------------------------------------------
 function Base.truncate(s::Series{C,M}, d::Int64) where {C,M}
     r = Series{C,M}()
@@ -549,23 +511,28 @@ Apply the linear functional `sigma` on monomials, terms, polynomials
 function LinearAlgebra.dot(sigma::Series{C,M}, v::V) where {C,M, V<:AbstractVariable}
     return sigma[monomial(v)]
 end
+LinearAlgebra.dot(v::AbstractVariable, sigma::Series) = LinearAlgebra.dot(sigma,v)
+
 function LinearAlgebra.dot(sigma::Series{C,M}, m::M) where {C,M<:AbstractMonomial}
     return sigma[m]
 end
+LinearAlgebra.dot(sigma::Series, m::AbstractMonomial) = LinearAlgebra(sigma,m)
 
-function LinearAlgebra.dot(sigma::Series{C,M}, t::T) where {C,M, T<:AbstractTerm}
+function LinearAlgebra.dot(sigma::Series{C,M}, t::AbstractTerm) where {C,M}
     return coefficient(t)*sigma[monomial(t)]
 end
+LinearAlgebra.dot(t::AbstractTerm, sigma::Series) = LinearAlgebra.dot(sigma,t)
 
-function LinearAlgebra.dot(sigma::Series{C,M}, p::P) where {C,M, P<:AbstractPolynomial}
+function LinearAlgebra.dot(sigma::Series{C,M}, p::AbstractPolynomial) where {C,M}
     r = zero(C)
     for t in p
         r+= coefficient(t)*sigma[monomial(t)]
     end
     return r
 end
+LinearAlgebra.dot(p::AbstractPolynomial, sigma::Series) = LinearAlgebra.dot(sigma,p)
 
-function LinearAlgebra.dot(sigma::Series{C,M}, p::P, q::P) where {C,M, P}
+function LinearAlgebra.dot(sigma::Series{C,M}, p::AbstractPolynomial, q::AbstractPolynomial) where {C,M}
     dot(sigma, p*q)
 end
 
@@ -643,3 +610,5 @@ function print(io::IO, p::Series{C,M}) where {M, C}
         print(io, zero(C))
     end
 end
+
+#----------------------------------------------------------------------

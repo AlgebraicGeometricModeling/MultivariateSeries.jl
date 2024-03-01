@@ -19,7 +19,7 @@ of the corresponding elements in L1 and L2.
 
 Example
 -------
-```jldoctest
+```
 julia> L =[1, x1, x2, x1^2, x1*x2, x2^2]
 
 julia> H = hankel(s,L,L)
@@ -32,11 +32,11 @@ julia> H = hankel(s,L,L)
  13.0  23.0  25.0   41.0  47.0  49.0
 ```
 """
-function hankel(sigma::Series{C,M}, L1::AbstractVector, L2::AbstractVector) where {C,M}
+function hankel(sigma::Series{C,M}, L1::Vector{M}, L2::Vector{M}) where {C, M<:AbstractMonomial}
    H = fill(zero(C), (length(L1), length(L2)));
    for i in 1:length(L1)
       for j in 1:length(L2)
-         H[i,j] = dot(sigma, L1[i]*L2[j])
+         H[i,j] = sigma[L1[i]*L2[j]]
       end
    end
    H
@@ -50,7 +50,7 @@ series(H::Matrix{C}, L1::Vector{M}, L2::Vector{M}) -> Series{C,M}
 Compute the series associated to the Hankel matrix H, with rows (resp. columns)
 indexed by the array of monomials L1 (resp. L2).
 """
-function series(H::Array{C,2} , L1::Vector{M}, L2::Vector{M}) where {C, M}
+function series(H::Array{C,2} , L1::Vector{M}, L2::Vector{M}) where {C, M<:AbstractMonomial}
     res = zero(Series{C,M})
     i = 1
     for m1  in L1
@@ -89,3 +89,19 @@ function hankelbasis(L1,L2)
     end
     table
 end
+
+
+function matrixof(S::Vector{Series{C,M}}) where {C,M}
+
+    L = monomials(sum(p for p in [sum(monomials(s)) for s in S]))
+    mtr = fill(zero(C), length(L), length(S) )
+    for i in 1:length(L)
+        for j in 1: length(S)
+            mtr[i,j] = S[j][L[i]]
+        end
+    end
+    return mtr, L
+end
+
+
+    
