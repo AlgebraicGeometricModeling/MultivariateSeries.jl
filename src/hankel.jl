@@ -32,7 +32,7 @@ julia> H = hankel(s,L,L)
  13.0  23.0  25.0   41.0  47.0  49.0
 ```
 """
-function hankel(sigma::Series{C,M}, L1::Vector{M}, L2::Vector{M}) where {C, M<:AbstractMonomial}
+function hankel(sigma::Series{C,M}, L1::AbstractVector, L2::AbstractVector) where {C, M<:AbstractMonomial}
    H = fill(zero(C), (length(L1), length(L2)));
    for i in 1:length(L1)
       for j in 1:length(L2)

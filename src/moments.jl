@@ -104,12 +104,10 @@ series(f::Function, L::Vector{M}) -> Series{C,M}
 Compute the generating series ``\\sum_{x^{α} \\in L} f(α) z^α``
 for a function  ``f: \\mathbb{N}^n \\rightarrow C`` and a sequence L of monomials.
 """
-function series(f::Function, L::Vector)
-   res = series(f(L[1].z), L[1])
-   for m in L
-         res[m] = f(m.z)
-   end
-   res
+function series(f::Function, L::AbstractVector)
+
+   return series([m => f(exponents(m)) for m in L])
+
 end
 
 #----------------------------------------------------------------------
@@ -131,20 +129,20 @@ series(w:: Vector{C}, P::Matrix{C}, L::Vector{M}) -> Series{C,M}
 ```
 Compute the series of the moment sequence ``∑_{i} ω_{i} P_{i}^α`` for ``α \\in L``.
 """
-function series(w:: Vector{C}, P, L::Vector{M}) where {C,M}
+function series(w:: AbstractVector, P::AbstractMatrix, L::AbstractVector) 
    series(moment(w,P), L)
 end
 
 #----------------------------------------------------------------------
 """
 ```
-series(w:: Vector{C}, P::AbstractMatrix, X, d::Int64) -> Series{C,M}
+series(w::AbstractVector, P::AbstractMatrix, X, d::Int64) -> Series{C,M}
 ```
 Compute the series of the moment sequence ``∑_i ω_{i} P_{i}^α`` for ``|α| \\leq d``.
 """
-function series(w::Vector{C}, P::AbstractMatrix, X, d::Int64) where C
+function series(w::AbstractVector, P::AbstractMatrix, X, d::Int64) 
     h = moment(w,P)
-    L = monomials(X,seq(0:d))
+    L = monomials(X,0:d)
    series(h,L)
 end
 

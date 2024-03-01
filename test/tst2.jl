@@ -1,6 +1,6 @@
-using MultivariateSeries, LinearAlgebra
+using DynamicPolynomials, MultivariateSeries, LinearAlgebra
 
-X = @ring x y z
+X = @polyvar x y z
 r  = 4
 w0 = rand(r)
 A0 = rand(3,r)

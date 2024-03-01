@@ -1,6 +1,6 @@
-using MultivariateSeries
+using DynamicPolynomials, MultivariateSeries
 
-X = @ring x1 x2 
+X = @polyvar x1 x2 
 n = length(X)
 r = 5
 
