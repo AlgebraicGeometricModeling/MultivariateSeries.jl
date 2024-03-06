@@ -4,17 +4,19 @@ and polynomial-exponential decomposition.
 
 ## Installation
 
-To install the latest version of the package within julia:
+To install the registered package within julia:
+
+```julia
+] add MultivariateSeries
+```
+
+or the latest version
 
 ```julia
 ] add https://github.com/AlgebraicGeometricModeling/MultivariateSeries.jl.git
 ```
 
-or the registered package
 
-```julia
-] add MultivariateSeries
-```
 
 ## Example
 
