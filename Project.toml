@@ -12,4 +12,6 @@ MultivariatePolynomials = "102ac46a-7ee4-5c85-9060-abc95bfdeaa3"
 
 [compat]
 DataStructures = "0.18"
-julia = "1"
+DynamicPolynomials = "0.5"
+MultivariatePolynomials = "0.5"
+julia = "1.7"
