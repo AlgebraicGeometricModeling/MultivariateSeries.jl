@@ -13,7 +13,7 @@ cst_rkf = r::Int64 -> function (S) return r end
 
 #------------------------------------------------------------------------
 # Decomposition of the pencil of matrices
-function decompose(H::Vector{Matrix{C}}, lambda::Vector, rkf::Function) where C
+function decompose(H::Vector{Matrix{C}}, lambda::Vector, rkf::Function) where {C}
     n = length(H)
 
     H0 = sum(H[i]*lambda[i] for i in 1:length(lambda))

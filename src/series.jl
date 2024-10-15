@@ -62,6 +62,10 @@ function series(s::Vector{Pair{M,C}}) where {C <: Number, M <: AbstractMonomial}
     Series{C,M}(OrderedDict(s))
 end
 
+function series(Lm::AbstractVector{M}, Lc::AbstractVector{C}) where {C <: Number, M <: AbstractMonomial}
+    Series{C,M}(OrderedDict(Lm[i]=> Lc[i] for i in 1:length(Lm)))
+end
+
 MultivariatePolynomials.terms(p::Series) = p.terms
 MultivariatePolynomials.monomials(p::Series) = keys(p.terms)
 MultivariatePolynomials.coefficients(p::Series) = values(p.terms)

@@ -152,12 +152,15 @@ end
 
 #----------------------------------------------------------------------
 """
- Coefficient matrix of the polynomials in P with respect to the monomial vector L
+```
+matrixof(P::Vector,L::Vector)
+```
+  matrix `M` which rows are the coefficient the polynomials in P with respect to the monomial vector L, so that `M*L=P` 
 """
-function matrixof(P::Vector{DynamicPolynomials.Polynomial{B,O,C}}, L ) where {B,O,C}
+function matrixof(P::AbstractVector, L::AbstractVector) 
 
-    M = fill(zero(C), length(P), length(L))
-    idx = Dict{Monomial{true},Int64}()
+    M = fill(zero(coefficient_type(P[1])), length(P), length(L))
+    idx = Dict{typeof(L[1]),Int64}()
     for i in 1:length(L)
         idx[L[i]] = i
     end
