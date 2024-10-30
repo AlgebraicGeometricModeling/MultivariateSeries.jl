@@ -51,15 +51,36 @@ end
 """
     Construct the series with the term (c,m).
 """
-function series(c::C, m::M) where {C <: Number, M <: AbstractMonomial}
+function series(c::C, m::M) where {C, M <: AbstractMonomial}
     Series{C,M}(OrderedDict(m => c))
+end
+
+"""
+```
+    series(t::OrderedDict{M,C})
+```
+    Construct the series from the OrderedDict t.
+"""
+function series(t::OrderedDict{M,C}) where {C,M <: AbstractMonomial}
+ 
+    Series{C,M}(t)
+end
+
+"""
+```
+    series(m::AbstractVector, c::AbstractVector)
+```
+    Construct the series with the vectors of monomials m and coefficients c. 
+"""
+function series( m::AbstractVector, c::AbstractVector)
+    series(OrderedDict([m[i] => c[i] for i in 1:length(m)]))
 end
 
 """
    Construct the series from an array of pairs  m=>c where m is a monomial and c the associate coefficient.
 """
-function series(s::Vector{Pair{M,C}}) where {C <: Number, M <: AbstractMonomial}
-    Series{C,M}(OrderedDict(s))
+function series(s::Vector{Pair{M,C}}) where {C, M <: AbstractMonomial}
+    series(OrderedDict(s))
 end
 
 function series(Lm::AbstractVector{M}, Lc::AbstractVector{C}) where {C <: Number, M <: AbstractMonomial}
