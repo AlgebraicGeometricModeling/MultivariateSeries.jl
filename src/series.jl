@@ -15,7 +15,9 @@ import Base:
 
 import Base: (&), (|)
 
-import LinearAlgebra: dot,  norm 
+import LinearAlgebra: dot,  norm
+
+export dot
 #----------------------------------------------------------------------
 """
 ```
@@ -398,21 +400,9 @@ end
 
 #----------------------------------------------------------------------
 """
-    Apply to p, the dual functional associated to s.
+    Apply the linear functional sigma to p.
 """
-function (|)(sigma::Series{C,M}, v::V) where {C,M, V<:AbstractVariable}
-    return dot(s,v)
-end
-
-function (|)(sigma::Series{C,M}, m::M) where {C,M<:AbstractMonomial}
-    return dot(sigma,m)
-end
-
-function (|)(sigma::Series{C,M}, t::T) where {C,M, T<:AbstractTerm}
-    return dot(sigma,t)
-end
-
-function (|)(sigma::Series{C,M}, p::P) where {C,M, P<:AbstractPolynomial}
+function (|)(sigma::MultivariateSeries.Series, p) 
     return dot(sigma,p)
 end
 
@@ -533,29 +523,31 @@ end
 Compute the dot product ``‹ p, q ›_{σ} = ‹ σ | p q ›`` or  ``‹ σ | p ›`` for p, q polynomials, terms or monomials.
 Apply the linear functional `sigma` on monomials, terms, polynomials
 """
-function LinearAlgebra.dot(sigma::Series{C,M}, v::V) where {C,M, V<:AbstractVariable}
+function LinearAlgebra.dot(sigma::Series, v::AbstractVariable) 
     return sigma[monomial(v)]
 end
-LinearAlgebra.dot(v::AbstractVariable, sigma::Series) = LinearAlgebra.dot(sigma,v)
+
+#LinearAlgebra.dot(v::AbstractVariable, sigma::Series) = LinearAlgebra.dot(sigma,v)
 
 function LinearAlgebra.dot(sigma::Series{C,M}, m::M) where {C,M<:AbstractMonomial}
     return sigma[m]
 end
-LinearAlgebra.dot(sigma::Series, m::AbstractMonomial) = LinearAlgebra(sigma,m)
+#LinearAlgebra.dot(sigma::Series, m::AbstractMonomial) = LinearAlgebra(sigma,m)
 
 function LinearAlgebra.dot(sigma::Series{C,M}, t::AbstractTerm) where {C,M}
     return coefficient(t)*sigma[monomial(t)]
 end
-LinearAlgebra.dot(t::AbstractTerm, sigma::Series) = LinearAlgebra.dot(sigma,t)
+
+#LinearAlgebra.dot(t::AbstractTerm, sigma::Series) = LinearAlgebra.dot(sigma,t)
 
 function LinearAlgebra.dot(sigma::Series{C,M}, p::AbstractPolynomial) where {C,M}
-    r = zero(C)
-    for t in p
-        r+= coefficient(t)*sigma[monomial(t)]
-    end
-    return r
+    cf = coefficients(p)
+    mn = monomials(p)
+
+    sum(cf[i]*sigma[mn[i]] for i in 1:length(cf))
 end
-LinearAlgebra.dot(p::AbstractPolynomial, sigma::Series) = LinearAlgebra.dot(sigma,p)
+
+#LinearAlgebra.dot(p::AbstractPolynomial, sigma::Series) = LinearAlgebra.dot(sigma,p)
 
 function LinearAlgebra.dot(sigma::Series{C,M}, p::AbstractPolynomial, q::AbstractPolynomial) where {C,M}
     dot(sigma, p*q)

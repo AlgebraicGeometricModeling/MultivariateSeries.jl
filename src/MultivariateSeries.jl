@@ -14,6 +14,7 @@ include("newton.jl")
 include("diagonalisation.jl")
 include("decompose.jl")
 
+#=
 export Seq, seq
 
 mutable struct Seq{T} val::T end
@@ -41,5 +42,6 @@ function DynamicPolynomials.MonomialVector(V::Vector{DynamicPolynomials.Variable
      end
      L
 end
+=#
 
 end

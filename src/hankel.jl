@@ -6,7 +6,7 @@
 ### Bernard Mourrain
 ###
 
-export series, hankel, hankelbasis
+export series, hankel, hankelbasis, matrixof
 
 #-----------------------------------------------------------------------
 """
@@ -91,17 +91,51 @@ function hankelbasis(L1,L2)
 end
 
 
+"""
+```
+matrixof(P::Vector,L::Vector)
+```
+  matrix `M` which rows are the coefficient the polynomials in P with respect to the monomial vector L, so that `M*L=P` 
+"""
+function matrixof(P::AbstractVector, L::AbstractVector) 
+
+    M = fill(zero(coefficient_type(P[1])), length(P), length(L))
+    idx = Dict{typeof(L[1]),Int64}()
+    for i in 1:length(L)
+        idx[L[i]] = i
+    end
+
+    for i in 1:length(P)
+        for (c,m) in zip(coefficients(P[i]),monomials(P[i]))
+            j = get(idx,m,0)
+            if j!=0 M[i,j]=c end
+        end
+    end
+    M
+end
+
+
+"""
+```
+M, L = matrixof(S::Vector{Series})
+```
+ -  `M` matrix which rows are the coefficient the polynomials in P with respect to the monomial vector L
+ -  `L` vector of all monomials of `S`
+"""
+
 function matrixof(S::Vector{Series{C,M}}) where {C,M}
 
     L = monomials(sum(p for p in [sum(monomials(s)) for s in S]))
-    mtr = fill(zero(C), length(L), length(S) )
+    mtr = fill(zero(C), length(S), length(L) )
     for i in 1:length(L)
         for j in 1: length(S)
-            mtr[i,j] = S[j][L[i]]
+            mtr[j,i] = S[j][L[i]]
         end
     end
     return mtr, L
 end
+
+
 
 
     

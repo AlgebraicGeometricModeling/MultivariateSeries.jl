@@ -62,7 +62,7 @@ function coeff(t::Term{B,T}) where {B,T}
 end
 =#
 #----------------------------------------------------------------------
-function Base.one(::Type{Monomial{true}})
+function Base.one(::Type{DynamicPolynomials.Monomial{true}})
     Monomial{true}()
 end
 
@@ -73,7 +73,7 @@ exponent(m::Monomial) -> Array{Int64,1}
 ```
 Get the exponent of a monomial as an array of Int64
 """
-function Base.exponent(m::Monomial)
+function Base.exponent(m::DynamicPolynomials.Monomial)
     return m.z
 end
 
@@ -95,7 +95,7 @@ end
 ```
  return the inverse monomial with opposite exponents.
 """
-function Base.inv(m::Monomial{true})
+function Base.inv(m::DynamicPolynomials.Monomial{true})
     Monomial(m.vars,-m.z)
 end
 
@@ -103,11 +103,11 @@ function Base.inv(v::DynamicPolynomials.Variable{T}) where T
     inv(Monomial(v))
 end
 
-function inv!(m:: Monomial{true})
+function inv!(m::DynamicPolynomials.Monomial{true})
     m.z=-m.z
 end
 #----------------------------------------------------------------------
-function isprimal(m::Monomial{true})
+function isprimal(m::DynamicPolynomials.Monomial{true})
     return !any(t->t<0, m.z)
 end
 #-----------------------------------------------------------------------
@@ -151,28 +151,6 @@ function LinearAlgebra.norm(pol::AbstractPolynomial, p::Int64=2)
 end
 
 #----------------------------------------------------------------------
-"""
-```
-matrixof(P::Vector,L::Vector)
-```
-  matrix `M` which rows are the coefficient the polynomials in P with respect to the monomial vector L, so that `M*L=P` 
-"""
-function matrixof(P::AbstractVector, L::AbstractVector) 
-
-    M = fill(zero(coefficient_type(P[1])), length(P), length(L))
-    idx = Dict{typeof(L[1]),Int64}()
-    for i in 1:length(L)
-        idx[L[i]] = i
-    end
-
-    for i in 1:length(P)
-        for t in P[i]
-            j = get(idx,monomial(t),0)
-            if j!=0 M[i,j]=coefficient(t) end
-        end
-    end
-    M
-end
 
 """
     prodvec(X,Y)

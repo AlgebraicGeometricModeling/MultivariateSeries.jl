@@ -38,6 +38,18 @@ function diagonalization_iter(D)
     return X, Y
 end
 
+"""
+```
+Xi, E, Info =  diagonalization(M::Vector{Matrix{C}}, Info::Dict{String,Any})
+```
+
+Compute the joint diagonalizaion of the matrice in `M` (assuming it exists).
+It outputs
+
+    - `Xi` the diagonals row by row, the ith row for the matrix  `M[i]`
+    - `E`  the matrix of common eigenvectors so that `M[i] = E*diagm(Xi[i,:])*inv(E)`
+
+"""
 function diagonalization(M::Vector{Matrix{C}},
                          Info = Dict{String,Any}(
                              "maxIter" => 10,

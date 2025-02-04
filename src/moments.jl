@@ -28,7 +28,7 @@ end
 #------------------------------------------------------------------------
 """
 ```
-dual(p::Polynomial) -> Series{C,M}
+dual(p::Polynomial) -> Series{C}
 ```
 Compute the series associated to the polynomial p, replacing
 the variables xi by their dual variables dxi. C is the type of coefficients 
@@ -52,23 +52,33 @@ function _binomial(d, alpha::Vector{Int64})
   r
 end
 
-
+""""
+```
+dual(p::AbstractPolynomial, d:: Int64) -> Series{C}
+```
+Compute the series associated to the tensor p in degree d, using the apolar product.
+The coefficients are of type `C`, which is the promoted type between the type of the coefficients of `p` and `Rational{Int}`.
+The coefficients of the monomials `m` of  `p` are divided by the `binomial(d, exponents(m))`.
+"""
 function dual(p::AbstractPolynomial, d::Int)
 
     C = promote_type(coefficient_type(p),Rational{Int})
-    c::Vector{C} = coefficients(p)
+    c = coefficients(p)
     m = monomials(p)
-    for i in 1:length(m)
-        c[i]/= _binomial(d,exponents(m[i]))
-    end
-    return series([m[i]=> c[i] for i in 1:length(c) ])
+
+    return series([m[i]=> C(c[i])/_binomial(d,exponents(m[i])) for i in 1:length(c) ])
 end
 
-
+"""
+Recover the polynomial from the series by duality.
+"""
 function dual(s::Series)
     dot(coefficients(s), monomials(s))
 end
 
+"""
+Recover the polynomial from the series, using the apolar duality i.e. multiplying the coefficients by a binomial.
+"""
 function dual(s::Series, d::Int)
     Mm = monomials(s)
     Cf = coefficients(s)
