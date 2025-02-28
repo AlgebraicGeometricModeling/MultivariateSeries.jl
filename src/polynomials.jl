@@ -1,4 +1,4 @@
-export @ring, deg, monoms, exponent, matrixof, prodvec, prodset
+export deg, monoms, exponent, matrixof, prodvec, prodset
 
 import DynamicPolynomials: maxdegree, monomials
 
@@ -9,6 +9,7 @@ function buildpolvar(::Type{PV}, arg, var) where PV
     :($(esc(arg)) = $var)
 end
 
+#=
 """
 ```
 @ring args...
@@ -27,6 +28,7 @@ macro ring(args...)
     push!(V, :(TMP = $X) )
     Base.reduce((x,y) -> :($x; $y), V; init = :() )
 end
+=#
 
 #----------------------------------------------------------------------
 #=
@@ -111,6 +113,7 @@ function isprimal(m::DynamicPolynomials.Monomial{true})
     return !any(t->t<0, m.z)
 end
 #-----------------------------------------------------------------------
+#=
 """
 Evaluate a polynomial p at a point x;
 
@@ -128,6 +131,7 @@ function (p::DynamicPolynomials.Polynomial{B,T})(x::AbstractVector, X=variables(
     return subs(p,[X[i]=>x[i] for i in 1:length(x)]...)
 
 end
+=#
 
 #----------------------------------------------------------------------
 function LinearAlgebra.norm(p::AbstractPolynomial, x::Float64)

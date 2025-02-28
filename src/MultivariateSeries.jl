@@ -1,7 +1,7 @@
 module MultivariateSeries
 
 using LinearAlgebra
-using MultivariatePolynomials
+#using MultivariatePolynomials
 using DynamicPolynomials
 
 include("series.jl")
