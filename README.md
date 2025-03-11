@@ -21,9 +21,9 @@ or the latest version
 ## Example
 
 ```julia
-using MultivariateSeries
+using MultivariateSeries, DynamicPolynomials
 
-X = @ring x1 x2 
+X = @polyvar x1 x2 
 n = length(X)
 d = 4
 r = 4
@@ -31,7 +31,7 @@ r = 4
 Xi0 = randn(n,r)
 w0  = rand(r)
 
-L = monomials(X,seq(0:5))
+L = monomials(X,0:5)
 sigma = series(w0, Xi0, L)
 
 
