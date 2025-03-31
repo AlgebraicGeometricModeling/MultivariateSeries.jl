@@ -80,7 +80,11 @@ Pages = map(file -> joinpath("code", file), filter(x ->endswith(x, "md"), readdi
 The package is available at [https://github.com/AlgebraicGeometricModeling/MultivariateSeries.jl.git](https://github.com/AlgebraicGeometricModeling/MultivariateSeries.jl.git)
 
 
-To install it from Julia:
+To install the registered version from Julia:
+```julia
+] add MultivariateSeries
+```
+or the last one:
 ```julia
 ] add https://github.com/AlgebraicGeometricModeling/MultivariateSeries.jl.git
 ```
@@ -90,14 +94,3 @@ using MultivariateSeries
 ```
 See the [Examples](@ref sec_examples) for more details.
 
-
-## Dependencies
-
-The package `MultivariateSeries` depends on the following packages:
-
-- `DynamicPolynomials` package on multivariate polynomials represented as lists of monomials.
-- `MultivariatePolynomials` generic interface package for multivariate polynomials.
-
-These packages will be installed with `MultivariateSeries`  (see [installation](@ref sec_installation)).
-
-        

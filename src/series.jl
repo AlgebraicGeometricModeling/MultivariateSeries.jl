@@ -74,7 +74,7 @@ end
 ```
     Construct the series with the vectors of monomials m and coefficients c. 
 """
-function series( m::AbstractVector, c::AbstractVector)
+function series( c::AbstractVector,  m::AbstractVector )
     series(OrderedDict([m[i] => c[i] for i in 1:length(m)]))
 end
 

@@ -1,4 +1,4 @@
-export moment, exp, log, series, dual, sparse_pol, sparse_decompose;
+export moment, exp, log, series, dual, sparse_pol, sparse_decompose, binomial;
 
 
 #----------------------------------------------------------------------
@@ -43,7 +43,13 @@ function dual(p::AbstractPolynomial)
     
 end
 
-function _binomial(d, alpha::Vector{Int64})
+"""
+```
+binomial(p::Polynomial) -> Series{C}
+```
+Multi-index bonomial coefficients.
+"""
+function Base.binomial(d::Int64, alpha::Vector{Int64})
   r = binomial(d, alpha[1])
   for i in 2:length(alpha)
       d -= alpha[i-1]
@@ -66,7 +72,7 @@ function dual(p::AbstractPolynomial, d::Int)
     c = coefficients(p)
     m = monomials(p)
 
-    return series([m[i]=> C(c[i])/_binomial(d,exponents(m[i])) for i in 1:length(c) ])
+    return series([m[i]=> C(c[i])/Base.binomial(d,exponents(m[i])) for i in 1:length(c) ])
 end
 
 """
@@ -82,7 +88,7 @@ Recover the polynomial from the series, using the apolar duality i.e. multiplyin
 function dual(s::Series, d::Int)
     Mm = monomials(s)
     Cf = coefficients(s)
-    return sum([m*(c*_binomial(d,exponents(m))) for (c,m) in zip(Cf,Mm)])
+    return sum([m*(c*Base.binomial(d,exponents(m))) for (c,m) in zip(Cf,Mm)])
 end
 
 #----------------------------------------------------------------------

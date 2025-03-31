@@ -33,13 +33,7 @@ julia> H = hankel(s,L,L)
 ```
 """
 function hankel(sigma::Series{C,M}, L1::AbstractVector, L2::AbstractVector) where {C, M<:AbstractMonomial}
-   H = fill(zero(C), (length(L1), length(L2)));
-   for i in 1:length(L1)
-      for j in 1:length(L2)
-         H[i,j] = sigma[L1[i]*L2[j]]
-      end
-   end
-   H
+    return [sigma[L1[i]*L2[j]] for i in 1:length(L1), j in 1:length(L2)]
 end
 
 #------------------------------------------------------------------------
