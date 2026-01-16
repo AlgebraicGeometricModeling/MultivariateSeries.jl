@@ -553,6 +553,28 @@ function LinearAlgebra.dot(sigma::Series{C,M}, p::AbstractPolynomial, q::Abstrac
     dot(sigma, p*q)
 end
 
+export series_from_apolar
+"""
+      s = series_from_apolar(F, X0, rescaling = 1, d = maxdegree(F))
+
+Compute the series from the apolar dual of the form F in degree `d`, setting `X0=>1` and rescalling the other variables `X[i] => X[i]/rescaling`
+"""
+function series_from_apolar(F, X0, rescaling = 1, d = maxdegree(F))
+    X = variables(F)
+    if rescaling != 1
+        Y = X[findall(v->v!=X0, X)]
+        P = subs(F,X0=>1, [y=>y/rescaling for y in Y]...)
+    else
+        P = subs(F,X0=>1)
+    end
+    c = coefficients(P)
+    m = monomials(P)
+    for i in 1:length(c)
+        e = exponents(m[i])
+        c[i] /= binomial(d, e)
+    end
+    return MultivariateSeries.dual(P)
+end
 #----------------------------------------------------------------------
 function show(io::IO, p::Series)
     print(io, p)
