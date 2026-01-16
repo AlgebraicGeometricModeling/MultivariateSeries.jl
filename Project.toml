@@ -2,7 +2,7 @@ name = "MultivariateSeries"
 uuid = "08acae6c-c1bf-11e9-0c27-6b1945f8789b"
 authors = ["mourrain <bernard.mourrain@inria.fr>"]
 repo = "https://github.com/AlgebraicGeometricModeling/MultivariateSeries.jl.git"
-version = "0.1.6"
+version = "0.1.5"
 
 [deps]
 DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
